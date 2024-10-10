@@ -1,0 +1,20 @@
+spring:
+  kafka:
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+      properties:
+        schema.registry.url: http://localhost:8081
+#    consumer:
+#      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+#      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+collector:
+  topic:
+    telemetry:
+      sensors:
+        v1: telemetry.sensors.v1
+      snapshots:
+        v1: telemetry.snapshots.v1
+      hubs:
+        v1: telemetry.hubs.v1
+

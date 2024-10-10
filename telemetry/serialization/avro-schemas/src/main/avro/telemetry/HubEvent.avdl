@@ -1,4 +1,88 @@
 @namespace("ru.yandex.practicum.kafka.telemetry.event")
 protocol HubEventProtocol {
 
+	/** Перечисление типов устройств */
+	enum DeviceTypeAvro {
+		MOTION_SENSOR,
+		TEMPERATURE_SENSOR,
+		LIGHT_SENSOR,
+		CLIMATE_SENSOR,
+		SWITCH_SENSOR
+	}
+
+	/** Перечисление типов условий для сценариев */
+	enum ConditionTypeAvro {
+		MOTION,
+		LUMINOSITY,
+		SWITCH,
+		TEMPERATURE,
+		CO2LEVEL,
+		HUMIDITY
+	}
+
+	/** Перечисление операций, допустимых для условий */
+	enum ConditionOperationAvro {
+		EQUALS,
+		GREATER_THAN,
+		LOWER_THAN
+	}
+
+	/** Перечисление типов действий для устройств */
+	enum ActionTypeAvro {
+		ACTIVATE,
+		DEACTIVATE,
+		INVERSE,
+		SET_VALUE
+	}
+
+	/** Событие добавления устройства */
+	record DeviceAddedEventAvro {
+		string id;                // Уникальный идентификатор устройства
+		DeviceTypeAvro type;      // Тип устройства
+	}
+
+	/** Событие удаления устройства */
+	record DeviceRemovedEventAvro {
+		string id;                // Уникальный идентификатор устройства
+	}
+
+	/** Описание условий сценария */
+	record ScenarioConditionAvro {
+		string sensor_id;                      // Идентификатор устройства
+		ConditionTypeAvro type;                // Тип условия
+		ConditionOperationAvro operation;      // Операция для условия
+		union { null, int, boolean } value = null; // Значение для сравнения в условии (может быть null)
+	}
+
+	/** Действия, выполняемые устройством в рамках сценария */
+	record DeviceActionAvro {
+		string sensor_id;                   // Идентификатор устройства
+		ActionTypeAvro type;                // Тип действия
+		union { null, int } value = null;   // Значение действия (если применимо)
+	}
+
+	/** Событие добавления сценария */
+	record ScenarioAddedEventAvro {
+		string name;                            // Уникальное название сценария
+		array<ScenarioConditionAvro> conditions; // Набор условий активации сценария
+		array<DeviceActionAvro> actions;        // Набор действий, выполняемых при активации сценария
+	}
+
+	/** Событие удаления сценария */
+	record ScenarioRemovedEventAvro {
+		string name;                            // Уникальное название сценария
+	}
+
+	/** Событие хаба */
+	record HubEventAvro {
+		string hub_id;                          // Идентификатор хаба
+		timestamp_ms timestamp;  // Метка времени события
+		union{
+			DeviceAddedEventAvro,
+			DeviceRemovedEventAvro,
+			ScenarioAddedEventAvro,
+			ScenarioRemovedEventAvro
+		} payload;                              // Данные события
+	}
+
 }
