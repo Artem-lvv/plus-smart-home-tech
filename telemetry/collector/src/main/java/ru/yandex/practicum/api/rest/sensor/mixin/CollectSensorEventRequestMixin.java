@@ -1,4 +1,4 @@
-package ru.yandex.practicum.sensor.mixin;
+package ru.yandex.practicum.api.rest.sensor.mixin;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;

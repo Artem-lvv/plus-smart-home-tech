@@ -1,12 +1,13 @@
-package ru.yandex.practicum.api;
+package ru.yandex.practicum.api.rest;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.hub.service.HubEventService;
+import ru.yandex.practicum.api.EventsApiDelegate;
+import ru.yandex.practicum.api.rest.hub.service.HubEventService;
 import ru.yandex.practicum.model.CollectHubEventRequest;
 import ru.yandex.practicum.model.CollectSensorEventRequest;
-import ru.yandex.practicum.sensor.service.SensorEventService;
+import ru.yandex.practicum.api.rest.sensor.service.SensorEventService;
 
 @Component
 @RequiredArgsConstructor

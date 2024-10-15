@@ -1,6 +1,8 @@
-package ru.yandex.practicum.sensor.service;
+package ru.yandex.practicum.api.rest.sensor.service;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.avro.specific.SpecificRecord;
+import org.apache.avro.specific.SpecificRecordBase;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
@@ -15,7 +17,7 @@ import ru.yandex.practicum.model.CollectSensorEventRequest;
 @RequiredArgsConstructor
 public class SensorEventServiceImpl implements SensorEventService {
 
-    private final KafkaTemplate<String, SensorEventAvro> kafkaTemplate;
+    private final KafkaTemplate<String, SpecificRecord> kafkaTemplate;
 
     @Qualifier("mvcConversionService")
     private final ConversionService cs;

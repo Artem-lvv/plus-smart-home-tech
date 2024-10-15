@@ -1,4 +1,4 @@
-package ru.yandex.practicum.hub.service;
+package ru.yandex.practicum.api.rest.hub.service;
 
 import org.springframework.http.ResponseEntity;
 import ru.yandex.practicum.model.CollectHubEventRequest;
