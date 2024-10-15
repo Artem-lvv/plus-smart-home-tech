@@ -1,4 +1,4 @@
-package ru.yandex.practicum.api.grpc.config;
+package ru.yandex.practicum.api.rest.config;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.avro.specific.SpecificRecord;
@@ -9,14 +9,13 @@ import org.springframework.core.env.Environment;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
-import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
 @RequiredArgsConstructor
-public class KafkaProducerConfig {
+public class KafkaProducerAvroConfig {
 
     private final Environment environment;
 
@@ -40,20 +39,4 @@ public class KafkaProducerConfig {
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
-    @Bean
-    public KafkaTemplate<String, HubEventProto> protobufKafkaTemplate(ProducerFactory<String,
-            HubEventProto> protobufProducerFactory) {
-        return new KafkaTemplate<>(protobufProducerFactory);
-    }
-
-    @Bean
-    public ProducerFactory<String, HubEventProto> protobufProducerFactory() {
-        Map<String, Object> configProps = new HashMap<>();
-        configProps.put("bootstrap.servers", environment.getProperty("spring.kafka.producer.bootstrap-servers"));
-        configProps.put("key.serializer", environment.getProperty("spring.kafka.producer.key-serializer"));
-        configProps.put("value.serializer", environment.getProperty("spring.kafka.protobuf-producer.value-serializer"));
-        configProps.put("schema.registry.url",
-                environment.getProperty("spring.kafka.protobuf-producer.properties.schema.registry.url"));
-        return new DefaultKafkaProducerFactory<>(configProps);
-    }
 }

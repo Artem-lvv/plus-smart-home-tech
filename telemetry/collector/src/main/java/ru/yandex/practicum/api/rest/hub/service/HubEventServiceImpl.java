@@ -2,6 +2,7 @@ package ru.yandex.practicum.api.rest.hub.service;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.avro.specific.SpecificRecord;
+import org.apache.avro.specific.SpecificRecordBase;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
@@ -29,7 +30,7 @@ public class HubEventServiceImpl implements HubEventService {
 
         HubEventAvro hubEventAvro = cs.convert(collectHubEventRequest, HubEventAvro.class);
 
-        kafkaTemplate.send(hubEventTopic, hubEventAvro);
+       kafkaTemplate.send(hubEventTopic, hubEventAvro);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

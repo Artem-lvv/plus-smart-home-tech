@@ -1,6 +1,7 @@
 package ru.yandex.practicum.api.grpc;
 
 import com.google.protobuf.Empty;
+import com.google.protobuf.Message;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
@@ -16,8 +17,7 @@ import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 @RequiredArgsConstructor
 public class EventCollector extends CollectorControllerGrpc.CollectorControllerImplBase {
 
-    private final KafkaTemplate<String, HubEventProto> kafkaTemplateProto;
-    private final KafkaTemplate<String, SensorEventProto> kafkaTemplateSensor;
+    private final KafkaTemplate<String, Message> kafkaTemplate;
 
     @Value("${collector.topic.telemetry.hubs.v1}")
     private String hubEventTopic;
@@ -28,7 +28,7 @@ public class EventCollector extends CollectorControllerGrpc.CollectorControllerI
     @Override
     public void collectSensorEvent(SensorEventProto request, StreamObserver<Empty> responseObserver) {
         try {
-            kafkaTemplateSensor.send(sensorTopic, request);
+            kafkaTemplate.send(sensorTopic, request);
 
             responseObserver.onNext(Empty.getDefaultInstance());
             responseObserver.onCompleted();
@@ -44,7 +44,7 @@ public class EventCollector extends CollectorControllerGrpc.CollectorControllerI
     @Override
     public void collectHubEvent(HubEventProto request, StreamObserver<Empty> responseObserver) {
         try {
-            kafkaTemplateProto.send(hubEventTopic, request);
+            kafkaTemplate.send(hubEventTopic, request);
 
             responseObserver.onNext(Empty.getDefaultInstance());
             responseObserver.onCompleted();
