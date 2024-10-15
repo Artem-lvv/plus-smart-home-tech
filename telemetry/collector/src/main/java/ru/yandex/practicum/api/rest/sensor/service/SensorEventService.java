@@ -1,4 +1,4 @@
-package ru.yandex.practicum.sensor.service;
+package ru.yandex.practicum.api.rest.sensor.service;
 
 import org.springframework.http.ResponseEntity;
 import ru.yandex.practicum.model.CollectSensorEventRequest;

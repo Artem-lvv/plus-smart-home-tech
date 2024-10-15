@@ -1,13 +1,38 @@
-spring:
-  kafka:
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
-      properties:
-        schema.registry.url: http://localhost:8081
+#spring:
+#  kafka:
+#    producer:
+#      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+#      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+#      properties:
+#        schema.registry.url: http://localhost:8081
+#
 #    consumer:
 #      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 #      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+
+spring:
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      # Общая конфигурация для Avro
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+      properties:
+        schema.registry.url: http://localhost:8081
+    avro-producer:
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+    protobuf-producer:
+      value-serializer: io.confluent.kafka.serializers.protobuf.KafkaProtobufSerializer
+      properties:
+        schema.registry.url: http://localhost:8081
+
+logging:
+  level:
+    org:
+      springframework:
+        kafka:
+          core: debug
+
 collector:
   topic:
     telemetry:
@@ -18,3 +43,6 @@ collector:
       hubs:
         v1: telemetry.hubs.v1
 
+grpc:
+  server:
+    port: 9090

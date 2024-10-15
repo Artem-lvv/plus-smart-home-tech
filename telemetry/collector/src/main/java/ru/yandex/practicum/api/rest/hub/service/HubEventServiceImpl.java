@@ -1,6 +1,7 @@
-package ru.yandex.practicum.hub.service;
+package ru.yandex.practicum.api.rest.hub.service;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.avro.specific.SpecificRecord;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
@@ -15,7 +16,7 @@ import ru.yandex.practicum.model.CollectHubEventRequest;
 @RequiredArgsConstructor
 public class HubEventServiceImpl implements HubEventService {
 
-    private final KafkaTemplate<String, HubEventAvro> kafkaTemplate;
+    private final KafkaTemplate<String, SpecificRecord> kafkaTemplate;
 
     @Qualifier("mvcConversionService")
     private final ConversionService cs;

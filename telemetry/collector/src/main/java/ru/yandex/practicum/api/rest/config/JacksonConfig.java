@@ -1,12 +1,12 @@
-package ru.yandex.practicum.config;
+package ru.yandex.practicum.api.rest.config;
 
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import ru.yandex.practicum.hub.mixin.CollectHubEventRequestMixin;
+import ru.yandex.practicum.api.rest.hub.mixin.CollectHubEventRequestMixin;
 import ru.yandex.practicum.model.CollectHubEventRequest;
 import ru.yandex.practicum.model.CollectSensorEventRequest;
-import ru.yandex.practicum.sensor.mixin.CollectSensorEventRequestMixin;
+import ru.yandex.practicum.api.rest.sensor.mixin.CollectSensorEventRequestMixin;
 
 import java.util.Map;
 

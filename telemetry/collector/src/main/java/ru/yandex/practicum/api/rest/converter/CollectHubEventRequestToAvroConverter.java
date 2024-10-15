@@ -1,4 +1,4 @@
-package ru.yandex.practicum.converter;
+package ru.yandex.practicum.api.rest.converter;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
