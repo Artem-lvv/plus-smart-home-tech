@@ -10,6 +10,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class ApplicationAggregator {
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(ApplicationAggregator.class, args);
-        context.getBean(AggregationStarter.class).start();
+//        context.getBean(AggregationStarter.class).start();
     }
 }

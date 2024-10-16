@@ -3,7 +3,9 @@ package ru.yandex.practicum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.errors.WakeupException;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
 
 /**
  * Класс AggregationStarter, ответственный за запуск агрегации данных.
@@ -13,6 +15,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class AggregationStarter {
 
+    private final KafkaTemplate<String, SensorsSnapshotAvro> kafkaTemplate;
+    //private final KafkaConsumer<String, SensorEventProto> kafkaConsumer;
     // ... объявление полей и конструктора ...
 
     /**
@@ -20,8 +24,11 @@ public class AggregationStarter {
      * Подписывается на топики для получения событий от датчиков,
      * формирует снимок их состояния и записывает в кафку.
      */
+
+
     public void start() {
         try {
+
 
             // ... подготовка к обработке данных ...
             // ... например, подписка на топик ...
