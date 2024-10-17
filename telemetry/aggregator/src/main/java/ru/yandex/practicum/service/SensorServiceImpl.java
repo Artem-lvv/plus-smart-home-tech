@@ -23,7 +23,7 @@ public class SensorServiceImpl implements SensorService {
     private final KafkaTemplate<String, SensorsSnapshotAvro> kafkaTemplate;
     private final ConversionService cs;
 
-    @Value("${aggregator.topic.telemetry.snapshots.v1}")
+   @Value("${aggregator.topic.telemetry.snapshots.v1}")
     private String snapshotTopic;
 
     @Override
@@ -40,7 +40,7 @@ public class SensorServiceImpl implements SensorService {
         if (!hubIdToSensorsSnapshotAvroMap.containsKey(newSensorEventAvro.get().getHubId())) {
             SensorStateAvro sensorStateAvro = SensorStateAvro.newBuilder()
                     .setTimestamp(newSensorEventAvro.get().getTimestamp())
-                    .setData(newSensorEventAvro.get())
+                    .setData(newSensorEventAvro.get().getPayload())
                     .build();
 
             Map<String, SensorStateAvro> sensorStateAvroMap = new HashMap<>(100);
@@ -58,7 +58,7 @@ public class SensorServiceImpl implements SensorService {
                     .get(newSensorEventAvro.get().getHubId());
             sensorsSnapshotAvro.getSensorsState().put(newSensorEventAvro.get().getId(), SensorStateAvro.newBuilder()
                     .setTimestamp(newSensorEventAvro.get().getTimestamp())
-                    .setData(newSensorEventAvro.get())
+                    .setData(newSensorEventAvro.get().getPayload())
                     .build());
         }
 
