@@ -9,6 +9,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 @ConfigurationPropertiesScan
 public class ApplicationAggregator {
     public static void main(String[] args) {
-        ConfigurableApplicationContext context = SpringApplication.run(ApplicationAggregator.class, args);
+        SpringApplication.run(ApplicationAggregator.class, args);
     }
 }
