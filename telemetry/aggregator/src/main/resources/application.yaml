@@ -11,6 +11,7 @@ spring:
       group-id: aggregator-group
       properties:
         schema.registry.url: http://localhost:8081
+        specific.protobuf.value.type: ru.yandex.practicum.grpc.telemetry.event.SensorEventProto
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: io.confluent.kafka.serializers.protobuf.KafkaProtobufDeserializer
       auto-offset-reset: earliest

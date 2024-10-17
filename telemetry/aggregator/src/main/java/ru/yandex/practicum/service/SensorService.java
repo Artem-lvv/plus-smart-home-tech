@@ -1,7 +1,7 @@
 package ru.yandex.practicum.service;
 
-import com.google.protobuf.Message;
+import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 
 public interface SensorService {
-    void addSensorsSnapshot(Message message);
+    void addSensorsSnapshot(SensorEventProto sensorEventProtoMessage);
 }
