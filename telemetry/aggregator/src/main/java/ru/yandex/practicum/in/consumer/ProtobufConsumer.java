@@ -1,12 +1,12 @@
-package ru.yandex.practicum;
+package ru.yandex.practicum.in.consumer;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 import ru.yandex.practicum.service.SensorService;
 
-@Service
+@Component
 @RequiredArgsConstructor
 public class ProtobufConsumer {
 
