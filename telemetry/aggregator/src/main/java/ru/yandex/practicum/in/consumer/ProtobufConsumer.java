@@ -1,4 +1,4 @@
-package ru.yandex.practicum.consumer;
+package ru.yandex.practicum.in.consumer;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;

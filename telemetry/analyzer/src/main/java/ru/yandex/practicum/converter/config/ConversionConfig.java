@@ -15,7 +15,7 @@ public class ConversionConfig {
     public ConversionService conversionService() {
         DefaultConversionService conversionService = new DefaultConversionService();
         conversionService.addConverter(new HubEventProtoToSensorConverter());
-       conversionService.addConverter(new ScenarioConditionProtoToConditionConverter());
+        conversionService.addConverter(new ScenarioConditionProtoToConditionConverter());
         conversionService.addConverter(new DeviceActionProtoToActionConverter());
 
         return conversionService;

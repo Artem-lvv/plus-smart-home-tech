@@ -29,7 +29,8 @@ spring:
       properties:
         schema.registry.url: http://localhost:8081
       auto-offset-reset: latest
-aggregator:
+
+analyzer:
   topic:
     telemetry:
       sensors:
@@ -38,3 +39,5 @@ aggregator:
         v1: telemetry.snapshots.v1
       hubs:
         v1: telemetry.hubs.v1
+  snapshot-properties:
+    temperatureCelsius: true

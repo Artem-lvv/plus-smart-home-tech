@@ -2,6 +2,7 @@ package ru.yandex.practicum.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -32,11 +33,11 @@ public class Sensor {
     @Column(name = "hub_id", nullable = false)
     private String hubId;
 
-    @OneToMany(mappedBy = "sensor")
+    @OneToMany(mappedBy = "sensor", fetch = FetchType.EAGER)
     @ToString.Exclude
     private Set<ScenarioCondition> scenarioConditions;
 
-    @OneToMany(mappedBy = "sensor")
+    @OneToMany(mappedBy = "sensor", fetch = FetchType.EAGER)
     @ToString.Exclude
     private Set<ScenarioAction> scenarioActions;
 

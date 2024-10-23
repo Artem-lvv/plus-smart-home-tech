@@ -37,7 +37,7 @@ public class HubServiceImpl implements HubService {
     private final ScenarioConditionRepository scenarioConditionRepository;
 
     @Override
-    public void pocessDeviceEvent(HubEventProto hubEventProto) {
+    public void processDeviceEvent(HubEventProto hubEventProto) {
         if (Objects.isNull(hubEventProto)) {
             return;
         }
