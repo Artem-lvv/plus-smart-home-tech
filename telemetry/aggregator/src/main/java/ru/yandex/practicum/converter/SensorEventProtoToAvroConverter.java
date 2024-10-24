@@ -11,13 +11,14 @@ import ru.yandex.practicum.kafka.telemetry.event.SwitchSensorAvro;
 import ru.yandex.practicum.kafka.telemetry.event.TemperatureSensorAvro;
 
 import java.time.Instant;
+import java.util.Objects;
 
 @Component
 public class SensorEventProtoToAvroConverter implements Converter<SensorEventProto, SensorEventAvro> {
 
     @Override
     public SensorEventAvro convert(SensorEventProto source) {
-        if (source == null) {
+        if (Objects.isNull(source)) {
             return null;
         }
 

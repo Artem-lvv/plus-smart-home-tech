@@ -1,6 +1,7 @@
 package ru.yandex.practicum.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -16,6 +17,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SensorServiceImpl implements SensorService {
@@ -52,6 +54,8 @@ public class SensorServiceImpl implements SensorService {
                     .setSensorsState(sensorStateAvroMap)
                     .build();
 
+            log.info("Create snapshot {}", sensorsSnapshotAvro);
+
             hubIdToSensorsSnapshotAvroMap.put(sensorsSnapshotAvro.getHubId(), sensorsSnapshotAvro);
         } else {
             sensorsSnapshotAvro = hubIdToSensorsSnapshotAvroMap
@@ -60,6 +64,8 @@ public class SensorServiceImpl implements SensorService {
                     .setTimestamp(newSensorEventAvro.get().getTimestamp())
                     .setData(newSensorEventAvro.get().getPayload())
                     .build());
+
+            log.info("Update snapshot {}", sensorsSnapshotAvro);
         }
 
         kafkaTemplate.send(snapshotTopic, sensorsSnapshotAvro);
@@ -89,7 +95,12 @@ public class SensorServiceImpl implements SensorService {
             return Optional.empty();
         }
 
-        return Optional.ofNullable(cs.convert(sensorEventProtoMessage, SensorEventAvro.class));
+        SensorEventAvro sensorEventAvro = cs.convert(sensorEventProtoMessage, SensorEventAvro.class);
+
+        log.info("Convert sensorEventProtoMessage to sensorEventAvro. Obj sensorEventProtoMessage - {}. " +
+                "Obj SensorEventAvro - {}", sensorEventProtoMessage, sensorEventAvro);
+
+        return Optional.ofNullable(sensorEventAvro);
     }
 
 }
