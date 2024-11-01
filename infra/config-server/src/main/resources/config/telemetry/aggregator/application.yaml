@@ -1,0 +1,26 @@
+spring:
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9092
+      properties:
+        schema.registry.url: http://localhost:8081
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: aggregator-group
+      properties:
+        schema.registry.url: http://localhost:8081
+        specific.protobuf.value.type: ru.yandex.practicum.grpc.telemetry.event.SensorEventProto
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: io.confluent.kafka.serializers.protobuf.KafkaProtobufDeserializer
+      auto-offset-reset: latest
+aggregator:
+  topic:
+    telemetry:
+      sensors:
+        v1: telemetry.sensors.v1
+      snapshots:
+        v1: telemetry.snapshots.v1
+      hubs:
+        v1: telemetry.hubs.v1
