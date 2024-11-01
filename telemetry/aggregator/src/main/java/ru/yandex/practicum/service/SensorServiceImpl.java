@@ -25,7 +25,7 @@ public class SensorServiceImpl implements SensorService {
     private final KafkaTemplate<String, SensorsSnapshotAvro> kafkaTemplate;
     private final ConversionService cs;
 
-   @Value("${aggregator.topic.telemetry.snapshots.v1}")
+    @Value("${aggregator.topic.telemetry.snapshots.v1}")
     private String snapshotTopic;
 
     @Override

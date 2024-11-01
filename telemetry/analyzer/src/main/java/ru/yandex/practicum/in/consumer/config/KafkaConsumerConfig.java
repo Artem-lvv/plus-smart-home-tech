@@ -55,7 +55,7 @@ public class KafkaConsumerConfig {
         configProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         configProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaProtobufDeserializer.class);
         configProps.put("schema.registry.url", SCHEMA_REGISTRY_URL);
-        configProps.put("specific.protobuf.value.type", " ru.yandex.practicum.grpc.telemetry.event.HubEventProto");
+        configProps.put("specific.protobuf.value.type", "ru.yandex.practicum.grpc.telemetry.event.HubEventProto");
 
         return new DefaultKafkaConsumerFactory<>(configProps);
     }
