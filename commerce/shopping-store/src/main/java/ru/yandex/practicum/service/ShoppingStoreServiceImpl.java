@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.exception.EntityNotFoundException;
 import ru.yandex.practicum.model.Pageable;
 import ru.yandex.practicum.model.ProductDto;
 import ru.yandex.practicum.model.ProductEntity;
@@ -46,6 +47,9 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
     @Override
     public ProductDto getProduct(UUID productId) {
         Optional<ProductEntity> productById = productRepository.findById(productId);
+        if (productById.isEmpty()) {
+            throw new EntityNotFoundException("Product", productId.toString());
+        }
         ProductDto productDto = cs.convert(productById, ProductDto.class);
 
         log.info("Get product by id: {}. Product: {}", productId, productById);
@@ -83,7 +87,7 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
             return true;
         } else {
             log.warn("Product with id: {} not found, cannot remove", productId);
-            return false;
+            throw new EntityNotFoundException("Product", productId.toString());
         }
     }
 
@@ -100,7 +104,7 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
             return true;
         } else {
             log.warn("Product with id: {} not found, cannot update quantity", request.getProductId());
-            return false;
+            throw new EntityNotFoundException("Product", request.getProductId().toString());
         }
     }
 
@@ -123,7 +127,7 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
             return updatedProductDto;
         } else {
             log.warn("Product with id: {} not found, cannot update", productDto.getProductId());
-            return null;
+            throw new EntityNotFoundException("Product", productDto.getProductId().get().toString());
         }
     }
 }

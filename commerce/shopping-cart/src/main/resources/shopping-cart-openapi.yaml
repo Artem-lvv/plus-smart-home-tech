@@ -54,6 +54,8 @@ paths:
             '*/*':
               schema:
                 type: array
+                items:
+                  type: "string"
       requestBody:
         content:
           application/json:
@@ -116,6 +118,8 @@ paths:
             '*/*':
               schema:
                 type: array
+                items:
+                  type: "string"
       requestBody:
         content:
           application/json:

@@ -8,7 +8,7 @@ grpc:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/aggregatorDB
+    url: jdbc:postgresql://localhost:5432/smartHomeDB
     username: myuser
     password: mypassword
     driver-class-name: org.postgresql.Driver
