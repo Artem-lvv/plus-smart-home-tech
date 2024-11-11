@@ -91,7 +91,7 @@
                     <inputSpec>${project.basedir}/src/main/resources/shopping-store-openapi.yaml</inputSpec>
                     <generatorName>spring</generatorName>
 <!--                    <library>spring-boot</library>-->
-                    <library>spring-cloud</library>
+                    <library>spring-boot</library>
                     <output>${project.build.directory}/generated-sources</output>
                     <apiPackage>ru.yandex.practicum.api</apiPackage>
                     <modelPackage>ru.yandex.practicum.model</modelPackage>

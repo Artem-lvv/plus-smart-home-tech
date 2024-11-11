@@ -50,7 +50,7 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
         if (productById.isEmpty()) {
             throw new EntityNotFoundException("Product", productId.toString());
         }
-        ProductDto productDto = cs.convert(productById, ProductDto.class);
+        ProductDto productDto = cs.convert(productById.get(), ProductDto.class);
 
         log.info("Get product by id: {}. Product: {}", productId, productById);
         log.info("Convert ProductEntity to ProductDto: {}. {}", productById, productDto);

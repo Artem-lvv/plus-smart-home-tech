@@ -70,7 +70,7 @@ paths:
         '200':
           description: Корзина товаров с изменениями
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/ShoppingCartDto'
         '401':

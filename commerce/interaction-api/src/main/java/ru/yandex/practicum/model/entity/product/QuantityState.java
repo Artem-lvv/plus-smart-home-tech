@@ -1,4 +1,4 @@
-package ru.yandex.practicum.model;
+package ru.yandex.practicum.model.entity.product;
 
 /**
  * Статус, перечисляющий состояние остатка как свойства товара

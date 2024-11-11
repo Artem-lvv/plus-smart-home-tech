@@ -16,7 +16,7 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 public class ApiApiDelegateImpl implements ApiApiDelegate {
-    ShoppingStoreService shoppingStoreService;
+    private final ShoppingStoreService shoppingStoreService;
 
     @Override
     public ResponseEntity<ProductDto> createNewProduct(ProductDto productDto) {
