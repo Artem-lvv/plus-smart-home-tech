@@ -30,30 +30,35 @@ public class ApiApiDelegateImpl implements ApiApiDelegate {
 
     @Override
     public ResponseEntity<BookedProductsDto> bookingProductsFromShoppingCart(String username) {
-        return null;
+        return new ResponseEntity<>(shoppingCartService.bookingProductsFromShoppingCart(username), HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<ProductDto> changeProductQuantity(String username,
                                                             ChangeProductQuantityRequest changeProductQuantityRequest2,
                                                             ChangeProductQuantityRequest changeProductQuantityRequest) {
-        return null;
+
+        return new ResponseEntity<>(shoppingCartService.changeProductQuantity(username,
+                changeProductQuantityRequest, changeProductQuantityRequest2),
+                HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<Void> deactivateCurrentShoppingCart(String username) {
-        return null;
+        shoppingCartService.deactivateCurrentShoppingCart(username);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<ShoppingCartDto> getShoppingCart(String username) {
-        return null;
+        return new ResponseEntity<>(shoppingCartService.getShoppingCart(username), HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<ShoppingCartDto> removeFromShoppingCart(String username,
                                                                   Map<String, Long> requestBody,
                                                                   List<String> products) {
-        return null;
+        return new ResponseEntity<>(shoppingCartService.removeFromShoppingCart(username, requestBody, products),
+                HttpStatus.OK);
     }
 }

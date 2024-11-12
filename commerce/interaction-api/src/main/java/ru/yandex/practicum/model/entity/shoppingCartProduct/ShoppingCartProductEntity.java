@@ -21,12 +21,12 @@ public class ShoppingCartProductEntity {
     @EmbeddedId
     private ShoppingCartProductId id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @MapsId("shoppingCartId")
     @JoinColumn(name = "shopping_cart_id", nullable = false)
     private ShoppingCartEntity shoppingCart;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @MapsId("productId")
     @JoinColumn(name = "product_id", nullable = false)
     private ProductEntity product;
