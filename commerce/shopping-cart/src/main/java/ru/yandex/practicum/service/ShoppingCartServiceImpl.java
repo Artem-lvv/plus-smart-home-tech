@@ -12,9 +12,9 @@ import ru.yandex.practicum.model.BookedProductsDto;
 import ru.yandex.practicum.model.ChangeProductQuantityRequest;
 import ru.yandex.practicum.model.ProductDto;
 import ru.yandex.practicum.model.ShoppingCartDto;
-import ru.yandex.practicum.model.entity.product.ProductEntity;
-import ru.yandex.practicum.model.entity.shoppingCart.ShoppingCartEntity;
-import ru.yandex.practicum.model.entity.shoppingCartProduct.ShoppingCartProductEntity;
+import ru.yandex.practicum.model.entity.product.Product;
+import ru.yandex.practicum.model.entity.shoppingCart.ShoppingCart;
+import ru.yandex.practicum.model.entity.shoppingCartProduct.ShoppingCartProduct;
 import ru.yandex.practicum.model.entity.shoppingCartProduct.ShoppingCartProductId;
 import ru.yandex.practicum.repository.ProductRepository;
 import ru.yandex.practicum.repository.ShoppingCartProductRepository;
@@ -48,56 +48,42 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                                                     List<String> products) {
 
         checkUsername(username);
+        ShoppingCart shoppingCart = getShoppingCartEntity(username);
 
-        Optional<ShoppingCartEntity> byUsernameAndDeactivatedFalse = shoppingCartRepository
-                .findByUsernameAndDeactivatedFalse(username);
-
-        ShoppingCartEntity shoppingCartEntity;
-        if (byUsernameAndDeactivatedFalse.isPresent()) {
-            shoppingCartEntity = byUsernameAndDeactivatedFalse.get();
-        } else {
-            shoppingCartEntity = ShoppingCartEntity.builder()
-                    .username(username)
-                    .deactivated(false)
-                    .build();
-            shoppingCartRepository.save(shoppingCartEntity);
-            log.info("Create ShoppingCart entity: {}", shoppingCartEntity);
-        }
-
-        Map<UUID, ProductEntity> uuidToProductEntity = productRepository.findAllByProductIdIn(requestBody.keySet())
+        Map<UUID, Product> uuidToProductEntity = productRepository.findAllByProductIdIn(requestBody.keySet())
                 .stream()
-                .collect(Collectors.toMap(ProductEntity::getProductId,
+                .collect(Collectors.toMap(Product::getProductId,
                         productEntity -> productEntity));
 
-        Map<UUID, ShoppingCartProductEntity> currentCartUuidProductToShopCartProduct =
-                getCurrentCartProductsByNewProductUUIDs(requestBody, shoppingCartEntity);
+        Map<UUID, ShoppingCartProduct> currentCartUuidProductToShopCartProduct =
+                getCurrentCartProductsByNewProductUUIDs(requestBody, shoppingCart);
 
         for (Map.Entry<String, Long> newProducts : requestBody.entrySet()) {
             UUID newProductUUID = UUID.fromString(newProducts.getKey());
-            ShoppingCartProductEntity shoppingCartProductEntity = currentCartUuidProductToShopCartProduct
+            ShoppingCartProduct shoppingCartProduct = currentCartUuidProductToShopCartProduct
                     .get(newProductUUID);
 
-            if (Objects.isNull(shoppingCartProductEntity)) {
-                ShoppingCartProductEntity newShoppingCartProductEntity = ShoppingCartProductEntity.builder()
+            if (Objects.isNull(shoppingCartProduct)) {
+                ShoppingCartProduct newShoppingCartProduct = ShoppingCartProduct.builder()
                         .id(ShoppingCartProductId.builder()
-                                .shoppingCartId(shoppingCartEntity.getShoppingCartId())
+                                .shoppingCartId(shoppingCart.getShoppingCartId())
                                 .productId(newProductUUID)
                                 .build())
-                        .shoppingCart(shoppingCartEntity)
+                        .shoppingCart(shoppingCart)
                         .product(uuidToProductEntity.get(newProductUUID))
                         .quantity(Math.toIntExact(newProducts.getValue()))
                         .addedAt(LocalDateTime.now())
                         .build();
-                currentCartUuidProductToShopCartProduct.put(newProductUUID, newShoppingCartProductEntity);
-                log.info("Create ShoppingCart product entity: {}", newShoppingCartProductEntity);
+                currentCartUuidProductToShopCartProduct.put(newProductUUID, newShoppingCartProduct);
+                log.info("Create ShoppingCart product entity: {}", newShoppingCartProduct);
             } else {
-                shoppingCartProductEntity.setQuantity(shoppingCartProductEntity.getQuantity()
+                shoppingCartProduct.setQuantity(shoppingCartProduct.getQuantity()
                         + Math.toIntExact(newProducts.getValue()));
-                log.info("Update ShoppingCart product entity: {}", shoppingCartProductEntity);
+                log.info("Update ShoppingCart product entity: {}", shoppingCartProduct);
             }
         }
 
-        List<ShoppingCartProductEntity> shoppingCartProductEntities = shoppingCartProductRepository
+        List<ShoppingCartProduct> shoppingCartProductEntities = shoppingCartProductRepository
                 .saveAll(currentCartUuidProductToShopCartProduct.values());
         log.info("Save/Update ShoppingCart product entity: {}", shoppingCartProductEntities);
 
@@ -108,19 +94,37 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                         uuidShoppingCartProductEntityEntry -> Integer.toUnsignedLong(uuidShoppingCartProductEntityEntry
                                 .getValue().getQuantity())));
 
-        ShoppingCartDto shoppingCartDto = new ShoppingCartDto(shoppingCartEntity.getShoppingCartId(),
+        ShoppingCartDto shoppingCartDto = new ShoppingCartDto(shoppingCart.getShoppingCartId(),
                 uuidProductToQuantity);
         log.info("Create ShoppingCartDto: {}", shoppingCartDto);
 
         return shoppingCartDto;
     }
 
-    private Map<UUID, ShoppingCartProductEntity> getCurrentCartProductsByNewProductUUIDs(Map<String, Long> requestBody,
-                                                                                         ShoppingCartEntity shoppingCartEntity) {
+    private ShoppingCart getShoppingCartEntity(String username) {
+        Optional<ShoppingCart> byUsernameAndDeactivatedFalse = shoppingCartRepository
+                .findByUsernameAndDeactivatedFalse(username);
+
+        ShoppingCart shoppingCart;
+        if (byUsernameAndDeactivatedFalse.isPresent()) {
+            shoppingCart = byUsernameAndDeactivatedFalse.get();
+        } else {
+            shoppingCart = ShoppingCart.builder()
+                    .username(username)
+                    .deactivated(false)
+                    .build();
+            shoppingCartRepository.save(shoppingCart);
+            log.info("Create ShoppingCart entity: {}", shoppingCart);
+        }
+        return shoppingCart;
+    }
+
+    private Map<UUID, ShoppingCartProduct> getCurrentCartProductsByNewProductUUIDs(Map<String, Long> requestBody,
+                                                                                   ShoppingCart shoppingCart) {
         List<ShoppingCartProductId> shoppingCartProductIdList = requestBody.keySet()
                 .stream()
                 .map(productId -> ShoppingCartProductId.builder()
-                        .shoppingCartId(shoppingCartEntity.getShoppingCartId())
+                        .shoppingCartId(shoppingCart.getShoppingCartId())
                         .productId(UUID.fromString(productId))
                         .build())
                 .toList();
@@ -128,8 +132,8 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         return shoppingCartProductRepository
                 .findAllById(shoppingCartProductIdList)
                 .stream()
-                .collect(Collectors.toMap(shoppingCartProductEntity -> shoppingCartProductEntity.getId().getProductId(),
-                        shoppingCartProductEntity -> shoppingCartProductEntity));
+                .collect(Collectors.toMap(shoppingCartProduct -> shoppingCartProduct.getId().getProductId(),
+                        shoppingCartProduct -> shoppingCartProduct));
     }
 
     @Override
@@ -139,17 +143,18 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     @Override
+    @Transactional
     public ProductDto changeProductQuantity(String username,
                                             ChangeProductQuantityRequest changeProductQuantityRequest2,
                                             ChangeProductQuantityRequest changeProductQuantityRequest) {
 
         checkUsername(username);
 
-        Optional<ShoppingCartEntity> shoppingCart = shoppingCartRepository
+        Optional<ShoppingCart> shoppingCart = shoppingCartRepository
                 .findByUsernameAndDeactivatedFalse(username);
 
-        Optional<ShoppingCartProductEntity> shoppingCartProductEntity = shoppingCartProductRepository
-                .findByShoppingCart_ShoppingCartIdAndId_ProductId(shoppingCart.get().getShoppingCartId(),
+        Optional<ShoppingCartProduct> shoppingCartProductEntity = shoppingCartProductRepository
+                .findByShoppingCartIdAndProductId_Fetch(shoppingCart.get().getShoppingCartId(),
                         changeProductQuantityRequest.getProductId());
 
         if (shoppingCartProductEntity.isEmpty()) {
@@ -170,10 +175,11 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     @Override
+    @Transactional
     public void deactivateCurrentShoppingCart(String username) {
         checkUsername(username);
 
-        Optional<ShoppingCartEntity> shoppingCart = shoppingCartRepository
+        Optional<ShoppingCart> shoppingCart = shoppingCartRepository
                 .findByUsernameAndDeactivatedFalse(username);
 
         shoppingCart.get().setDeactivated(true);
@@ -185,15 +191,15 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     public ShoppingCartDto getShoppingCart(String username) {
         checkUsername(username);
 
-        Optional<ShoppingCartEntity> shoppingCart = shoppingCartRepository.findByUsernameAndDeactivatedFalse(username);
-        List<ShoppingCartProductEntity> allByShoppingCartProductByCartId = shoppingCartProductRepository
-                .findAllByShoppingCart_ShoppingCartId(shoppingCart.get().getShoppingCartId());
+        Optional<ShoppingCart> shoppingCart = shoppingCartRepository.findByUsernameAndDeactivatedFalse(username);
+        List<ShoppingCartProduct> allByShoppingCartProductByCartId = shoppingCartProductRepository
+                .findAllByShoppingCart_ShoppingCartId_Fetch(shoppingCart.get().getShoppingCartId());
 
         Map<String, Long> uuidProductToQuantity = allByShoppingCartProductByCartId
                 .stream()
-                .collect(Collectors.toMap(shoppingCartProductEntity -> shoppingCartProductEntity
-                                .getProduct().getProductId().toString(),
-                        shoppingCartProductEntity -> Integer.toUnsignedLong(shoppingCartProductEntity.getQuantity())));
+                .collect(Collectors.toMap(shoppingCartProduct -> shoppingCartProduct.getProduct()
+                                .getProductId().toString(),
+                        shoppingCartProduct -> Integer.toUnsignedLong(shoppingCartProduct.getQuantity())));
 
         ShoppingCartDto shoppingCartDto = new ShoppingCartDto(shoppingCart.get().getShoppingCartId(),
                 uuidProductToQuantity);
@@ -203,27 +209,27 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     @Override
+    @Transactional
     public ShoppingCartDto removeFromShoppingCart(String username,
                                                   Map<String, Long> requestBody,
                                                   List<String> products) {
 
         checkUsername(username);
+        Optional<ShoppingCart> shoppingCart = shoppingCartRepository.findByUsernameAndDeactivatedFalse(username);
 
-        Optional<ShoppingCartEntity> shoppingCart = shoppingCartRepository.findByUsernameAndDeactivatedFalse(username);
-
-        Map<String, ShoppingCartProductEntity> idProductToShopCartProduct = shoppingCartProductRepository
-                .findAllByShoppingCart_ShoppingCartId(shoppingCart.get().getShoppingCartId())
+        Map<String, ShoppingCartProduct> idProductToShopCartProduct = shoppingCartProductRepository
+                .findAllByShoppingCart_ShoppingCartId_Fetch(shoppingCart.get().getShoppingCartId())
                 .stream()
                 .collect(Collectors.toMap(
-                        shoppingCartProductEntity -> shoppingCartProductEntity.getProduct().getProductId().toString(),
-                        shoppingCartProductEntity -> shoppingCartProductEntity));
+                        shoppingCartProduct -> shoppingCartProduct.getProduct().getProductId().toString(),
+                        shoppingCartProduct -> shoppingCartProduct));
 
         List<ShoppingCartProductId> deletedList = new ArrayList<>(10);
 
         requestBody.keySet().forEach(productId -> {
-            ShoppingCartProductEntity shoppingCartProductEntity = idProductToShopCartProduct.get(productId);
-            if (Objects.nonNull(shoppingCartProductEntity)) {
-                deletedList.add(shoppingCartProductEntity.getId());
+            ShoppingCartProduct shoppingCartProduct = idProductToShopCartProduct.get(productId);
+            if (Objects.nonNull(shoppingCartProduct)) {
+                deletedList.add(shoppingCartProduct.getId());
                 idProductToShopCartProduct.remove(productId);
             } else {
                 throw new ProductIdUnauthorizedException(productId);
@@ -238,6 +244,9 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                 .collect(Collectors.toMap(Map.Entry::getKey,
                         entry -> Integer.toUnsignedLong(entry.getValue().getQuantity())));
 
-        return new ShoppingCartDto(shoppingCart.get().getShoppingCartId(), collect);
+        ShoppingCartDto shoppingCartDto = new ShoppingCartDto(shoppingCart.get().getShoppingCartId(), collect);
+        log.info("Create hoppingCartDto: {}", shoppingCartDto);
+
+        return shoppingCartDto;
     }
 }

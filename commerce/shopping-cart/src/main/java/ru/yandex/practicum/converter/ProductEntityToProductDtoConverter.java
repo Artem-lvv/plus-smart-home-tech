@@ -5,12 +5,12 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.model.ProductDto;
 import ru.yandex.practicum.model.ProductState;
 import ru.yandex.practicum.model.QuantityState;
-import ru.yandex.practicum.model.entity.product.ProductEntity;
+import ru.yandex.practicum.model.entity.product.Product;
 
 @Component
-public class ProductEntityToProductDtoConverter implements Converter<ProductEntity, ProductDto> {
+public class ProductEntityToProductDtoConverter implements Converter<Product, ProductDto> {
     @Override
-    public ProductDto convert(ProductEntity src) {
+    public ProductDto convert(Product src) {
         return new ProductDto(src.getProductId(),
                 src.getProductName(),
                 src.getDescription(),

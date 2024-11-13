@@ -24,7 +24,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Table(name = "shopping_carts")
-public class ShoppingCartEntity {
+public class ShoppingCart {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "shopping_cart_id", nullable = false)
@@ -40,7 +40,7 @@ public class ShoppingCartEntity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ShoppingCartEntity that = (ShoppingCartEntity) o;
+        ShoppingCart that = (ShoppingCart) o;
         return Objects.equals(shoppingCartId, that.shoppingCartId) && Objects.equals(username, that.username);
     }
 

@@ -2,15 +2,14 @@ package ru.yandex.practicum.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.model.entity.shoppingCart.ShoppingCartEntity;
+import ru.yandex.practicum.model.entity.shoppingCart.ShoppingCart;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface ShoppingCartRepository extends JpaRepository<ShoppingCartEntity, UUID> {
-    Optional<ShoppingCartEntity> findByUsernameAndDeactivatedFalse(String username);
+public interface ShoppingCartRepository extends JpaRepository<ShoppingCart, UUID> {
 
-    List<ShoppingCartEntity> findAllByShoppingCartId(UUID shoppingCartId);
+    Optional<ShoppingCart> findByUsernameAndDeactivatedFalse(String username);
+
 }

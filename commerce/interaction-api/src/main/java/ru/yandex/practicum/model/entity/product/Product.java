@@ -7,7 +7,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,12 +15,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.proxy.HibernateProxy;
-import ru.yandex.practicum.model.entity.shoppingCart.ShoppingCartEntity;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -32,7 +28,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Table(name = "products")
-public class ProductEntity {
+public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "product_id", nullable = false)
@@ -76,7 +72,7 @@ public class ProductEntity {
                 ? proxy.getHibernateLazyInitializer().getPersistentClass()
                 : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        ProductEntity that = (ProductEntity) o;
+        Product that = (Product) o;
         return getProductId() != null && Objects.equals(getProductId(), that.getProductId());
     }
 

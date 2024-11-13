@@ -2,8 +2,8 @@ package ru.yandex.practicum.model.entity.shoppingCartProduct;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ru.yandex.practicum.model.entity.product.ProductEntity;
-import ru.yandex.practicum.model.entity.shoppingCart.ShoppingCartEntity;
+import ru.yandex.practicum.model.entity.product.Product;
+import ru.yandex.practicum.model.entity.shoppingCart.ShoppingCart;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -16,20 +16,20 @@ import java.util.Objects;
 @AllArgsConstructor
 @ToString
 @Table(name = "cart_products")
-public class ShoppingCartProductEntity {
+public class ShoppingCartProduct {
 
     @EmbeddedId
     private ShoppingCartProductId id;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @MapsId("shoppingCartId")
     @JoinColumn(name = "shopping_cart_id", nullable = false)
-    private ShoppingCartEntity shoppingCart;
+    private ShoppingCart shoppingCart;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @MapsId("productId")
     @JoinColumn(name = "product_id", nullable = false)
-    private ProductEntity product;
+    private Product product;
 
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
@@ -41,7 +41,7 @@ public class ShoppingCartProductEntity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ShoppingCartProductEntity that = (ShoppingCartProductEntity) o;
+        ShoppingCartProduct that = (ShoppingCartProduct) o;
         return Objects.equals(id, that.id) && Objects.equals(shoppingCart, that.shoppingCart)
                 && Objects.equals(product, that.product) && Objects.equals(quantity, that.quantity)
                 && Objects.equals(addedAt, that.addedAt);
