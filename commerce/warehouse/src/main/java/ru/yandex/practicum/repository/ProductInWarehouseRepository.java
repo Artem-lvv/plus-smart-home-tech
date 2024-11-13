@@ -13,6 +13,14 @@ import java.util.UUID;
 public interface ProductInWarehouseRepository extends JpaRepository<ProductInWarehouse, UUID> {
     Optional<ProductInWarehouse> findByProduct_ProductId(UUID productId);
 
+    @Query("SELECT pw " +
+            "FROM ProductInWarehouse pw " +
+            "JOIN FETCH pw.dimension " +
+            "JOIN FETCH pw.product " +
+            "WHERE pw.product.productId IN :productIds")
+    List<ProductInWarehouse> findAllByProductId_Fetch(@Param("productIds") List<UUID> productId);
+
+
     @Query("""
         SELECT piw.product.productId, 
                (piw.availableStock - COALESCE(SUM(rp.reservedQuantity), 0))

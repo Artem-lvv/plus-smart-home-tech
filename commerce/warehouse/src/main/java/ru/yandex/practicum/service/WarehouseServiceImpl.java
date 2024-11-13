@@ -7,6 +7,7 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.condig.AddressWarehouse;
+import ru.yandex.practicum.entity.Dimension;
 import ru.yandex.practicum.entity.ProductInWarehouse;
 import ru.yandex.practicum.entity.ReservedProduct;
 import ru.yandex.practicum.exception.DuplicateEntityException;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -35,7 +37,6 @@ import java.util.stream.Collectors;
 public class WarehouseServiceImpl implements WarehouseService {
 
     private final ReservedProductRepository reservedProductRepository;
-
     private final ProductInWarehouseRepository productInWarehouseRepository;
     private final ProductRepository productRepository;
     private final AddressWarehouse addressWarehouse;
@@ -119,18 +120,44 @@ public class WarehouseServiceImpl implements WarehouseService {
                 throw new NotEnoughProductInStockException(uuidProduct.toString(), available - requiredQuantity);
             } else {
                 toReservation.add(ReservedProduct.builder()
-                                .shoppingCartId(shoppingCartDto.getShoppingCartId())
-                                .productId(uuidProduct)
-                                .reservedQuantity(requiredQuantity)
+                        .shoppingCartId(shoppingCartDto.getShoppingCartId())
+                        .productId(uuidProduct)
+                        .reservedQuantity(requiredQuantity)
                         .build());
-            };
+            }
         });
 
         reservedProductRepository.saveAll(toReservation);
         log.info("Create ReservedProduct {}", toReservation);
 
+        Map<UUID, ProductInWarehouse> productIdToPIW = productInWarehouseRepository
+                .findAllByProductId_Fetch(toReservation
+                        .stream()
+                        .map(ReservedProduct::getProductId)
+                        .toList())
+                .stream()
+                .collect(Collectors.toMap(productInWarehouse -> productInWarehouse.getProduct().getProductId(),
+                        productInWarehouse -> productInWarehouse));
 
+        AtomicReference<Double> weight = new AtomicReference<>(0.0);
+        AtomicReference<Double> volume = new AtomicReference<>(0.0);
+        AtomicReference<Boolean> fragile = new AtomicReference<>(false);
 
-        return null;
+        reservationProducts.forEach((productId, quantity) -> {
+            ProductInWarehouse productInWarehouse = productIdToPIW.get(productId);
+            fragile.set(productInWarehouse.getFragile());
+            weight.updateAndGet(v -> v + productInWarehouse.getWeight() * quantity);
+            Dimension dimension = productInWarehouse.getDimension();
+            volume.updateAndGet(v -> v + dimension.getHeight() * dimension.getWidth() * dimension.getDepth());
+        });
+
+        BookedProductsDto bookedProductsDto = new BookedProductsDto();
+        bookedProductsDto.setDeliveryWeight(weight.get());
+        bookedProductsDto.setDeliveryVolume(volume.get());
+        bookedProductsDto.setFragile(fragile.get());
+
+        log.info("Create BookedProductsDto {}", bookedProductsDto);
+
+        return bookedProductsDto;
     }
 }
