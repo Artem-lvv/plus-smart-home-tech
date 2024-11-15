@@ -3,114 +3,47 @@ info:
   title: Smart Home Technologies API
   version: '1.0'
 servers:
-  - url: http://192.168.1.125:55905
+  - url: http://warehouse
     description: Generated server url
 tags:
-  - name: Корзина для онлайн-магазина
-    description: API для обеспечения работы корзины онлайн магазина
+  - name: warehouse
+    description: API для обеспечения работы склада онлайн магазина
 paths:
-  /api/v1/shopping-cart:
-    get:
-      tags:
-        - Корзина для онлайн-магазина
-      description: Получить актуальную корзину для авторизованного пользователя.
-      operationId: getShoppingCart
-      parameters:
-        - name: username
-          in: query
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: >-
-            Ранее созданная или новая, в случае ранее созданной, корзина в
-            онлайн магазине
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ShoppingCartDto'
-        '401':
-          description: Имя пользователя не должно быть пустым
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/NotAuthorizedUserException'
+  /api/v1/warehouse:
     put:
       tags:
-        - Корзина для онлайн-магазина
-      description: Добавить товар в корзину.
-      operationId: addProductToShoppingCart
-      parameters:
-        - name: username
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: products
-          in: query
-          description: Отображение идентификатора товара на отобранное количество.
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  type: "string"
+        - warehouse
+      description: Добавить новый товар на склад.
+      operationId: newProductInWarehouse
+#      parameters:
+#        - name: newProductInWarehouseRequest
+#          in: query
+#          description: Описание нового товара для обработки складом.
+#          schema:
+#            $ref: '#/components/schemas/NewProductInWarehouseRequest'
       requestBody:
         content:
           application/json:
             schema:
-              type: object
-              additionalProperties:
-                type: integer
-                format: int64
-              description: Отображение идентификатора товара на отобранное количество.
+              $ref: '#/components/schemas/NewProductInWarehouseRequest'
         required: true
-      responses:
-        '200':
-          description: Корзина товаров с изменениями
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ShoppingCartDto'
-        '401':
-          description: Имя пользователя не должно быть пустым
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/NotAuthorizedUserException'
-    delete:
-      tags:
-        - Корзина для онлайн-магазина
-      description: Деактивация корзины товаров для пользователя.
-      operationId: deactivateCurrentShoppingCart
-      parameters:
-        - name: username
-          in: query
-          required: true
-          schema:
-            type: string
       responses:
         '200':
           description: OK
-        '401':
-          description: Имя пользователя не должно быть пустым
+        '400':
+          description: Ошибка, товар с таким описанием уже зарегистрирован на складе
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/NotAuthorizedUserException'
-  /api/v1/shopping-cart/remove:
+                $ref: >-
+                  #/components/schemas/SpecifiedProductAlreadyInWarehouseException
+  /api/v1/warehouse/return:
     post:
       tags:
-        - Корзина для онлайн-магазина
-      description: Изменить состав товаров в корзине, т.е. удалить другие.
-      operationId: removeFromShoppingCart
+        - warehouse
+      description: Принять возврат товаров на склад.
+      operationId: acceptReturn
       parameters:
-        - name: username
-          in: query
-          required: true
-          schema:
-            type: string
         - name: products
           in: query
           description: Отображение идентификатора товара на отобранное количество.
@@ -119,7 +52,13 @@ paths:
               schema:
                 type: array
                 items:
-                  type: "string"
+                  type: object
+                  properties:
+                    productId:
+                      type: string
+                    quantity:
+                      type: integer
+                      format: int64
       requestBody:
         content:
           application/json:
@@ -132,100 +71,329 @@ paths:
         required: true
       responses:
         '200':
-          description: Корзина товаров с изменениями
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ShoppingCartDto'
-        '400':
-          description: Нет искомых товаров в корзине
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/NoProductsInShoppingCartException'
-        '401':
-          description: Имя пользователя не должно быть пустым
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/NotAuthorizedUserException'
-  /api/v1/shopping-cart/change-quantity:
+          description: OK
+  /api/v1/warehouse/booking:
     post:
       tags:
-        - Корзина для онлайн-магазина
-      description: Изменить количество товаров в корзине.
-      operationId: changeProductQuantity
-      parameters:
-        - name: username
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: changeProductQuantityRequest
-          in: query
-          description: Отображение идентификатора товара на отобранное количество.
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ChangeProductQuantityRequest'
+        - warehouse
+      description: Зарезервировать товары на складе по корзине.
+      operationId: bookingProductForShoppingCart
+#      parameters:
+#        - name: shoppingCart
+#          in: query
+#          description: Корзина товаров.
+#          schema:
+#            $ref: '#/components/schemas/ShoppingCartDto'
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ChangeProductQuantityRequest'
+              $ref: '#/components/schemas/ShoppingCartDto'
         required: true
       responses:
         '200':
-          description: Актуальный товар со всеми сведениями из БД
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/ProductDto'
-        '400':
-          description: Нет искомых товаров в корзине
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/NoProductsInShoppingCartException'
-        '401':
-          description: Имя пользователя не должно быть пустым
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/NotAuthorizedUserException'
-  /api/v1/shopping-cart/booking:
-    post:
-      tags:
-        - Корзина для онлайн-магазина
-      description: Зарезервировать товары на складе.
-      operationId: bookingProductsFromShoppingCart
-      parameters:
-        - name: username
-          in: query
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Описательный объект со сведениями о бронировании
+          description: Общие сведения по бронированию
           content:
             '*/*':
               schema:
                 $ref: '#/components/schemas/BookedProductsDto'
         '400':
-          description: Ошибка,товара уже нет на складе
+          description: >-
+            Ошибка, товар из корзины не находится в требуемом количестве на
+            складе
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/ProductInShoppingCartNotInWarehouse'
-        '401':
-          description: Имя пользователя не должно быть пустым
+                $ref: >-
+                  #/components/schemas/ProductInShoppingCartLowQuantityInWarehouse
+  /api/v1/warehouse/assembly:
+    post:
+      tags:
+        - warehouse
+      description: >-
+        Собрать ранее зарезервированные товары к заказу для подготовки к
+        отправке.
+      operationId: assemblyProductForOrderFromShoppingCart
+#      parameters:
+#        - name: assemblyProductForOrderFromShoppingCartRequest
+#          in: query
+#          description: Корзина товаров.
+#          schema:
+#            $ref: >-
+#              #/components/schemas/AssemblyProductForOrderFromShoppingCartRequest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: >-
+                #/components/schemas/AssemblyProductForOrderFromShoppingCartRequest
+        required: true
+      responses:
+        '200':
+          description: Общие сведения по бронированию
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/NotAuthorizedUserException'
+                $ref: '#/components/schemas/BookedProductsDto'
+        '400':
+          description: Ошибка, товара из бронирования нет в БД склада
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/NoSpecifiedProductInWarehouseException'
+  /api/v1/warehouse/add:
+    post:
+      tags:
+        - warehouse
+      description: Принять товар на склад.
+      operationId: addProductToWarehouse
+#      parameters:
+#        - name: addProductToWarehouseRequest
+#          in: query
+#          description: Запрос на добавление определенного количества определенного товара.
+#          schema:
+#            $ref: '#/components/schemas/AddProductToWarehouseRequest'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddProductToWarehouseRequest'
+        required: true
+      responses:
+        '400':
+          description: Нет информации о товаре на складе
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/NoSpecifiedProductInWarehouseException'
+  /api/v1/warehouse/address:
+    get:
+      tags:
+        - warehouse
+      description: Предоставить адрес склада для расчёта доставки.
+      operationId: getWarehouseAddress
+      responses:
+        '200':
+          description: Актуальный адрес склада
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AddressDto'
 components:
   schemas:
+    DimensionDto:
+      required:
+        - depth
+        - height
+        - width
+      type: object
+      properties:
+        width:
+          minimum: 1
+          type: number
+          description: Ширина
+          format: double
+        height:
+          minimum: 1
+          type: number
+          description: Высота
+          format: double
+          example: 1
+        depth:
+          minimum: 1
+          type: number
+          description: Глубина
+          format: double
+          example: 1
+      description: Размеры товара
+    NewProductInWarehouseRequest:
+      required:
+        - dimension
+        - productId
+        - weight
+      type: object
+      properties:
+        productId:
+          type: string
+          description: Идентификатор товара в БД
+          format: uuid
+          example: 53aa35c8-e659-44b2-882f-f6056e443c99
+        fragile:
+          type: boolean
+          description: Признак хрупкости
+          example: true
+        dimension:
+          $ref: '#/components/schemas/DimensionDto'
+        weight:
+          minimum: 1
+          type: number
+          description: Вес товара
+          format: double
+          example: 1
+      description: Запрос на добавление нового товара на склад
+    SpecifiedProductAlreadyInWarehouseException:
+      type: object
+      properties:
+        cause:
+          type: object
+          properties:
+            stackTrace:
+              type: array
+              items:
+                type: object
+                properties:
+                  classLoaderName:
+                    type: string
+                  moduleName:
+                    type: string
+                  moduleVersion:
+                    type: string
+                  methodName:
+                    type: string
+                  fileName:
+                    type: string
+                  lineNumber:
+                    type: integer
+                    format: int32
+                  className:
+                    type: string
+                  nativeMethod:
+                    type: boolean
+            message:
+              type: string
+            localizedMessage:
+              type: string
+        stackTrace:
+          type: array
+          items:
+            type: object
+            properties:
+              classLoaderName:
+                type: string
+              moduleName:
+                type: string
+              moduleVersion:
+                type: string
+              methodName:
+                type: string
+              fileName:
+                type: string
+              lineNumber:
+                type: integer
+                format: int32
+              className:
+                type: string
+              nativeMethod:
+                type: boolean
+        httpStatus:
+          type: string
+          enum:
+            - 100 CONTINUE
+            - 101 SWITCHING_PROTOCOLS
+            - 102 PROCESSING
+            - 103 EARLY_HINTS
+            - 103 CHECKPOINT
+            - 200 OK
+            - 201 CREATED
+            - 202 ACCEPTED
+            - 203 NON_AUTHORITATIVE_INFORMATION
+            - 204 NO_CONTENT
+            - 205 RESET_CONTENT
+            - 206 PARTIAL_CONTENT
+            - 207 MULTI_STATUS
+            - 208 ALREADY_REPORTED
+            - 226 IM_USED
+            - 300 MULTIPLE_CHOICES
+            - 301 MOVED_PERMANENTLY
+            - 302 FOUND
+            - 302 MOVED_TEMPORARILY
+            - 303 SEE_OTHER
+            - 304 NOT_MODIFIED
+            - 305 USE_PROXY
+            - 307 TEMPORARY_REDIRECT
+            - 308 PERMANENT_REDIRECT
+            - 400 BAD_REQUEST
+            - 401 UNAUTHORIZED
+            - 402 PAYMENT_REQUIRED
+            - 403 FORBIDDEN
+            - 404 NOT_FOUND
+            - 405 METHOD_NOT_ALLOWED
+            - 406 NOT_ACCEPTABLE
+            - 407 PROXY_AUTHENTICATION_REQUIRED
+            - 408 REQUEST_TIMEOUT
+            - 409 CONFLICT
+            - 410 GONE
+            - 411 LENGTH_REQUIRED
+            - 412 PRECONDITION_FAILED
+            - 413 PAYLOAD_TOO_LARGE
+            - 413 REQUEST_ENTITY_TOO_LARGE
+            - 414 URI_TOO_LONG
+            - 414 REQUEST_URI_TOO_LONG
+            - 415 UNSUPPORTED_MEDIA_TYPE
+            - 416 REQUESTED_RANGE_NOT_SATISFIABLE
+            - 417 EXPECTATION_FAILED
+            - 418 I_AM_A_TEAPOT
+            - 419 INSUFFICIENT_SPACE_ON_RESOURCE
+            - 420 METHOD_FAILURE
+            - 421 DESTINATION_LOCKED
+            - 422 UNPROCESSABLE_ENTITY
+            - 423 LOCKED
+            - 424 FAILED_DEPENDENCY
+            - 425 TOO_EARLY
+            - 426 UPGRADE_REQUIRED
+            - 428 PRECONDITION_REQUIRED
+            - 429 TOO_MANY_REQUESTS
+            - 431 REQUEST_HEADER_FIELDS_TOO_LARGE
+            - 451 UNAVAILABLE_FOR_LEGAL_REASONS
+            - 500 INTERNAL_SERVER_ERROR
+            - 501 NOT_IMPLEMENTED
+            - 502 BAD_GATEWAY
+            - 503 SERVICE_UNAVAILABLE
+            - 504 GATEWAY_TIMEOUT
+            - 505 HTTP_VERSION_NOT_SUPPORTED
+            - 506 VARIANT_ALSO_NEGOTIATES
+            - 507 INSUFFICIENT_STORAGE
+            - 508 LOOP_DETECTED
+            - 509 BANDWIDTH_LIMIT_EXCEEDED
+            - 510 NOT_EXTENDED
+            - 511 NETWORK_AUTHENTICATION_REQUIRED
+        userMessage:
+          type: string
+        message:
+          type: string
+        suppressed:
+          type: array
+          items:
+            type: object
+            properties:
+              stackTrace:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    classLoaderName:
+                      type: string
+                    moduleName:
+                      type: string
+                    moduleVersion:
+                      type: string
+                    methodName:
+                      type: string
+                    fileName:
+                      type: string
+                    lineNumber:
+                      type: integer
+                      format: int32
+                    className:
+                      type: string
+                    nativeMethod:
+                      type: boolean
+              message:
+                type: string
+              localizedMessage:
+                type: string
+        localizedMessage:
+          type: string
     ShoppingCartDto:
       required:
         - products
@@ -245,583 +413,6 @@ components:
             format: int64
           description: Отображение идентификатора товара на отобранное количество.
       description: Корзина товаров в онлайн магазине.
-    NotAuthorizedUserException:
-      type: object
-      properties:
-        cause:
-          type: object
-          properties:
-            stackTrace:
-              type: array
-              items:
-                type: object
-                properties:
-                  classLoaderName:
-                    type: string
-                  moduleName:
-                    type: string
-                  moduleVersion:
-                    type: string
-                  methodName:
-                    type: string
-                  fileName:
-                    type: string
-                  lineNumber:
-                    type: integer
-                    format: int32
-                  className:
-                    type: string
-                  nativeMethod:
-                    type: boolean
-            message:
-              type: string
-            localizedMessage:
-              type: string
-        stackTrace:
-          type: array
-          items:
-            type: object
-            properties:
-              classLoaderName:
-                type: string
-              moduleName:
-                type: string
-              moduleVersion:
-                type: string
-              methodName:
-                type: string
-              fileName:
-                type: string
-              lineNumber:
-                type: integer
-                format: int32
-              className:
-                type: string
-              nativeMethod:
-                type: boolean
-        httpStatus:
-          type: string
-          enum:
-            - 100 CONTINUE
-            - 101 SWITCHING_PROTOCOLS
-            - 102 PROCESSING
-            - 103 EARLY_HINTS
-            - 103 CHECKPOINT
-            - 200 OK
-            - 201 CREATED
-            - 202 ACCEPTED
-            - 203 NON_AUTHORITATIVE_INFORMATION
-            - 204 NO_CONTENT
-            - 205 RESET_CONTENT
-            - 206 PARTIAL_CONTENT
-            - 207 MULTI_STATUS
-            - 208 ALREADY_REPORTED
-            - 226 IM_USED
-            - 300 MULTIPLE_CHOICES
-            - 301 MOVED_PERMANENTLY
-            - 302 FOUND
-            - 302 MOVED_TEMPORARILY
-            - 303 SEE_OTHER
-            - 304 NOT_MODIFIED
-            - 305 USE_PROXY
-            - 307 TEMPORARY_REDIRECT
-            - 308 PERMANENT_REDIRECT
-            - 400 BAD_REQUEST
-            - 401 UNAUTHORIZED
-            - 402 PAYMENT_REQUIRED
-            - 403 FORBIDDEN
-            - 404 NOT_FOUND
-            - 405 METHOD_NOT_ALLOWED
-            - 406 NOT_ACCEPTABLE
-            - 407 PROXY_AUTHENTICATION_REQUIRED
-            - 408 REQUEST_TIMEOUT
-            - 409 CONFLICT
-            - 410 GONE
-            - 411 LENGTH_REQUIRED
-            - 412 PRECONDITION_FAILED
-            - 413 PAYLOAD_TOO_LARGE
-            - 413 REQUEST_ENTITY_TOO_LARGE
-            - 414 URI_TOO_LONG
-            - 414 REQUEST_URI_TOO_LONG
-            - 415 UNSUPPORTED_MEDIA_TYPE
-            - 416 REQUESTED_RANGE_NOT_SATISFIABLE
-            - 417 EXPECTATION_FAILED
-            - 418 I_AM_A_TEAPOT
-            - 419 INSUFFICIENT_SPACE_ON_RESOURCE
-            - 420 METHOD_FAILURE
-            - 421 DESTINATION_LOCKED
-            - 422 UNPROCESSABLE_ENTITY
-            - 423 LOCKED
-            - 424 FAILED_DEPENDENCY
-            - 425 TOO_EARLY
-            - 426 UPGRADE_REQUIRED
-            - 428 PRECONDITION_REQUIRED
-            - 429 TOO_MANY_REQUESTS
-            - 431 REQUEST_HEADER_FIELDS_TOO_LARGE
-            - 451 UNAVAILABLE_FOR_LEGAL_REASONS
-            - 500 INTERNAL_SERVER_ERROR
-            - 501 NOT_IMPLEMENTED
-            - 502 BAD_GATEWAY
-            - 503 SERVICE_UNAVAILABLE
-            - 504 GATEWAY_TIMEOUT
-            - 505 HTTP_VERSION_NOT_SUPPORTED
-            - 506 VARIANT_ALSO_NEGOTIATES
-            - 507 INSUFFICIENT_STORAGE
-            - 508 LOOP_DETECTED
-            - 509 BANDWIDTH_LIMIT_EXCEEDED
-            - 510 NOT_EXTENDED
-            - 511 NETWORK_AUTHENTICATION_REQUIRED
-        userMessage:
-          type: string
-        message:
-          type: string
-        suppressed:
-          type: array
-          items:
-            type: object
-            properties:
-              stackTrace:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    classLoaderName:
-                      type: string
-                    moduleName:
-                      type: string
-                    moduleVersion:
-                      type: string
-                    methodName:
-                      type: string
-                    fileName:
-                      type: string
-                    lineNumber:
-                      type: integer
-                      format: int32
-                    className:
-                      type: string
-                    nativeMethod:
-                      type: boolean
-              message:
-                type: string
-              localizedMessage:
-                type: string
-        localizedMessage:
-          type: string
-    NoProductsInShoppingCartException:
-      type: object
-      properties:
-        cause:
-          type: object
-          properties:
-            stackTrace:
-              type: array
-              items:
-                type: object
-                properties:
-                  classLoaderName:
-                    type: string
-                  moduleName:
-                    type: string
-                  moduleVersion:
-                    type: string
-                  methodName:
-                    type: string
-                  fileName:
-                    type: string
-                  lineNumber:
-                    type: integer
-                    format: int32
-                  className:
-                    type: string
-                  nativeMethod:
-                    type: boolean
-            message:
-              type: string
-            localizedMessage:
-              type: string
-        stackTrace:
-          type: array
-          items:
-            type: object
-            properties:
-              classLoaderName:
-                type: string
-              moduleName:
-                type: string
-              moduleVersion:
-                type: string
-              methodName:
-                type: string
-              fileName:
-                type: string
-              lineNumber:
-                type: integer
-                format: int32
-              className:
-                type: string
-              nativeMethod:
-                type: boolean
-        httpStatus:
-          type: string
-          enum:
-            - 100 CONTINUE
-            - 101 SWITCHING_PROTOCOLS
-            - 102 PROCESSING
-            - 103 EARLY_HINTS
-            - 103 CHECKPOINT
-            - 200 OK
-            - 201 CREATED
-            - 202 ACCEPTED
-            - 203 NON_AUTHORITATIVE_INFORMATION
-            - 204 NO_CONTENT
-            - 205 RESET_CONTENT
-            - 206 PARTIAL_CONTENT
-            - 207 MULTI_STATUS
-            - 208 ALREADY_REPORTED
-            - 226 IM_USED
-            - 300 MULTIPLE_CHOICES
-            - 301 MOVED_PERMANENTLY
-            - 302 FOUND
-            - 302 MOVED_TEMPORARILY
-            - 303 SEE_OTHER
-            - 304 NOT_MODIFIED
-            - 305 USE_PROXY
-            - 307 TEMPORARY_REDIRECT
-            - 308 PERMANENT_REDIRECT
-            - 400 BAD_REQUEST
-            - 401 UNAUTHORIZED
-            - 402 PAYMENT_REQUIRED
-            - 403 FORBIDDEN
-            - 404 NOT_FOUND
-            - 405 METHOD_NOT_ALLOWED
-            - 406 NOT_ACCEPTABLE
-            - 407 PROXY_AUTHENTICATION_REQUIRED
-            - 408 REQUEST_TIMEOUT
-            - 409 CONFLICT
-            - 410 GONE
-            - 411 LENGTH_REQUIRED
-            - 412 PRECONDITION_FAILED
-            - 413 PAYLOAD_TOO_LARGE
-            - 413 REQUEST_ENTITY_TOO_LARGE
-            - 414 URI_TOO_LONG
-            - 414 REQUEST_URI_TOO_LONG
-            - 415 UNSUPPORTED_MEDIA_TYPE
-            - 416 REQUESTED_RANGE_NOT_SATISFIABLE
-            - 417 EXPECTATION_FAILED
-            - 418 I_AM_A_TEAPOT
-            - 419 INSUFFICIENT_SPACE_ON_RESOURCE
-            - 420 METHOD_FAILURE
-            - 421 DESTINATION_LOCKED
-            - 422 UNPROCESSABLE_ENTITY
-            - 423 LOCKED
-            - 424 FAILED_DEPENDENCY
-            - 425 TOO_EARLY
-            - 426 UPGRADE_REQUIRED
-            - 428 PRECONDITION_REQUIRED
-            - 429 TOO_MANY_REQUESTS
-            - 431 REQUEST_HEADER_FIELDS_TOO_LARGE
-            - 451 UNAVAILABLE_FOR_LEGAL_REASONS
-            - 500 INTERNAL_SERVER_ERROR
-            - 501 NOT_IMPLEMENTED
-            - 502 BAD_GATEWAY
-            - 503 SERVICE_UNAVAILABLE
-            - 504 GATEWAY_TIMEOUT
-            - 505 HTTP_VERSION_NOT_SUPPORTED
-            - 506 VARIANT_ALSO_NEGOTIATES
-            - 507 INSUFFICIENT_STORAGE
-            - 508 LOOP_DETECTED
-            - 509 BANDWIDTH_LIMIT_EXCEEDED
-            - 510 NOT_EXTENDED
-            - 511 NETWORK_AUTHENTICATION_REQUIRED
-        userMessage:
-          type: string
-        message:
-          type: string
-        suppressed:
-          type: array
-          items:
-            type: object
-            properties:
-              stackTrace:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    classLoaderName:
-                      type: string
-                    moduleName:
-                      type: string
-                    moduleVersion:
-                      type: string
-                    methodName:
-                      type: string
-                    fileName:
-                      type: string
-                    lineNumber:
-                      type: integer
-                      format: int32
-                    className:
-                      type: string
-                    nativeMethod:
-                      type: boolean
-              message:
-                type: string
-              localizedMessage:
-                type: string
-        localizedMessage:
-          type: string
-    ChangeProductQuantityRequest:
-      required:
-        - newQuantity
-        - productId
-      type: object
-      properties:
-        productId:
-          type: string
-          description: Идентификатор товара
-          format: uuid
-        newQuantity:
-          type: integer
-          description: Новое количество товара
-          format: int64
-      description: Запрос на изменение количества единиц товара
-    ProductCategory:
-      type: string
-      description: Категория товара
-      example: DEVICE
-      enum:
-        - LIGHTING
-        - CONTROL
-        - SENSORS
-    ProductDto:
-      required:
-        - description
-        - price
-        - productId
-        - productName
-        - productState
-        - quantityState
-        - rating
-      type: object
-      properties:
-        productId:
-          type: string
-          description: Идентификатор товара в БД
-          format: uuid
-          nullable: true
-          example: 53aa35c8-e659-44b2-882f-f6056e443c99
-        productName:
-          type: string
-          description: Наименование товара
-          example: device_1
-        description:
-          type: string
-          description: Описание товара
-          example: Управляемый товар
-        imageSrc:
-          type: string
-          description: 'Ссылка на картинку во внешнем хранилище или SVG '
-          nullable: true
-          example: image/src/device_1
-        quantityState:
-          $ref: '#/components/schemas/QuantityState'
-        productState:
-          $ref: '#/components/schemas/ProductState'
-        rating:
-          maximum: 5
-          minimum: 1
-          type: number
-          description: Рейтинг товара на основе оценок пользователей
-          format: double
-          example: 5
-        productCategory:
-          $ref: '#/components/schemas/ProductCategory'
-        price:
-          minimum: 1
-          type: number
-          description: Цена товара
-          example: 123.12
-      description: Товар, продаваемый в интернет-магазине
-    ProductState:
-      type: string
-      description: Статус товара
-      example: ACTIVE
-      enum:
-        - ACTIVE
-        - DEACTIVATE
-    QuantityState:
-      type: string
-      description: Статус, перечисляющий состояние остатка как свойства товара
-      example: ENDED
-      enum:
-        - ENDED
-        - FEW
-        - ENOUGH
-        - MANY
-    ProductInShoppingCartNotInWarehouse:
-      type: object
-      properties:
-        cause:
-          type: object
-          properties:
-            stackTrace:
-              type: array
-              items:
-                type: object
-                properties:
-                  classLoaderName:
-                    type: string
-                  moduleName:
-                    type: string
-                  moduleVersion:
-                    type: string
-                  methodName:
-                    type: string
-                  fileName:
-                    type: string
-                  lineNumber:
-                    type: integer
-                    format: int32
-                  className:
-                    type: string
-                  nativeMethod:
-                    type: boolean
-            message:
-              type: string
-            localizedMessage:
-              type: string
-        stackTrace:
-          type: array
-          items:
-            type: object
-            properties:
-              classLoaderName:
-                type: string
-              moduleName:
-                type: string
-              moduleVersion:
-                type: string
-              methodName:
-                type: string
-              fileName:
-                type: string
-              lineNumber:
-                type: integer
-                format: int32
-              className:
-                type: string
-              nativeMethod:
-                type: boolean
-        httpStatus:
-          type: string
-          enum:
-            - 100 CONTINUE
-            - 101 SWITCHING_PROTOCOLS
-            - 102 PROCESSING
-            - 103 EARLY_HINTS
-            - 103 CHECKPOINT
-            - 200 OK
-            - 201 CREATED
-            - 202 ACCEPTED
-            - 203 NON_AUTHORITATIVE_INFORMATION
-            - 204 NO_CONTENT
-            - 205 RESET_CONTENT
-            - 206 PARTIAL_CONTENT
-            - 207 MULTI_STATUS
-            - 208 ALREADY_REPORTED
-            - 226 IM_USED
-            - 300 MULTIPLE_CHOICES
-            - 301 MOVED_PERMANENTLY
-            - 302 FOUND
-            - 302 MOVED_TEMPORARILY
-            - 303 SEE_OTHER
-            - 304 NOT_MODIFIED
-            - 305 USE_PROXY
-            - 307 TEMPORARY_REDIRECT
-            - 308 PERMANENT_REDIRECT
-            - 400 BAD_REQUEST
-            - 401 UNAUTHORIZED
-            - 402 PAYMENT_REQUIRED
-            - 403 FORBIDDEN
-            - 404 NOT_FOUND
-            - 405 METHOD_NOT_ALLOWED
-            - 406 NOT_ACCEPTABLE
-            - 407 PROXY_AUTHENTICATION_REQUIRED
-            - 408 REQUEST_TIMEOUT
-            - 409 CONFLICT
-            - 410 GONE
-            - 411 LENGTH_REQUIRED
-            - 412 PRECONDITION_FAILED
-            - 413 PAYLOAD_TOO_LARGE
-            - 413 REQUEST_ENTITY_TOO_LARGE
-            - 414 URI_TOO_LONG
-            - 414 REQUEST_URI_TOO_LONG
-            - 415 UNSUPPORTED_MEDIA_TYPE
-            - 416 REQUESTED_RANGE_NOT_SATISFIABLE
-            - 417 EXPECTATION_FAILED
-            - 418 I_AM_A_TEAPOT
-            - 419 INSUFFICIENT_SPACE_ON_RESOURCE
-            - 420 METHOD_FAILURE
-            - 421 DESTINATION_LOCKED
-            - 422 UNPROCESSABLE_ENTITY
-            - 423 LOCKED
-            - 424 FAILED_DEPENDENCY
-            - 425 TOO_EARLY
-            - 426 UPGRADE_REQUIRED
-            - 428 PRECONDITION_REQUIRED
-            - 429 TOO_MANY_REQUESTS
-            - 431 REQUEST_HEADER_FIELDS_TOO_LARGE
-            - 451 UNAVAILABLE_FOR_LEGAL_REASONS
-            - 500 INTERNAL_SERVER_ERROR
-            - 501 NOT_IMPLEMENTED
-            - 502 BAD_GATEWAY
-            - 503 SERVICE_UNAVAILABLE
-            - 504 GATEWAY_TIMEOUT
-            - 505 HTTP_VERSION_NOT_SUPPORTED
-            - 506 VARIANT_ALSO_NEGOTIATES
-            - 507 INSUFFICIENT_STORAGE
-            - 508 LOOP_DETECTED
-            - 509 BANDWIDTH_LIMIT_EXCEEDED
-            - 510 NOT_EXTENDED
-            - 511 NETWORK_AUTHENTICATION_REQUIRED
-        userMessage:
-          type: string
-        message:
-          type: string
-        suppressed:
-          type: array
-          items:
-            type: object
-            properties:
-              stackTrace:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    classLoaderName:
-                      type: string
-                    moduleName:
-                      type: string
-                    moduleVersion:
-                      type: string
-                    methodName:
-                      type: string
-                    fileName:
-                      type: string
-                    lineNumber:
-                      type: integer
-                      format: int32
-                    className:
-                      type: string
-                    nativeMethod:
-                      type: boolean
-              message:
-                type: string
-              localizedMessage:
-                type: string
-        localizedMessage:
-          type: string
     BookedProductsDto:
       required:
         - deliveryVolume
@@ -841,3 +432,383 @@ components:
           type: boolean
           description: Есть ли хрупкие вещи в доставке.
       description: Общие сведения о зарезервированных товарах по корзине.
+    ProductInShoppingCartLowQuantityInWarehouse:
+      type: object
+      properties:
+        cause:
+          type: object
+          properties:
+            stackTrace:
+              type: array
+              items:
+                type: object
+                properties:
+                  classLoaderName:
+                    type: string
+                  moduleName:
+                    type: string
+                  moduleVersion:
+                    type: string
+                  methodName:
+                    type: string
+                  fileName:
+                    type: string
+                  lineNumber:
+                    type: integer
+                    format: int32
+                  className:
+                    type: string
+                  nativeMethod:
+                    type: boolean
+            message:
+              type: string
+            localizedMessage:
+              type: string
+        stackTrace:
+          type: array
+          items:
+            type: object
+            properties:
+              classLoaderName:
+                type: string
+              moduleName:
+                type: string
+              moduleVersion:
+                type: string
+              methodName:
+                type: string
+              fileName:
+                type: string
+              lineNumber:
+                type: integer
+                format: int32
+              className:
+                type: string
+              nativeMethod:
+                type: boolean
+        httpStatus:
+          type: string
+          enum:
+            - 100 CONTINUE
+            - 101 SWITCHING_PROTOCOLS
+            - 102 PROCESSING
+            - 103 EARLY_HINTS
+            - 103 CHECKPOINT
+            - 200 OK
+            - 201 CREATED
+            - 202 ACCEPTED
+            - 203 NON_AUTHORITATIVE_INFORMATION
+            - 204 NO_CONTENT
+            - 205 RESET_CONTENT
+            - 206 PARTIAL_CONTENT
+            - 207 MULTI_STATUS
+            - 208 ALREADY_REPORTED
+            - 226 IM_USED
+            - 300 MULTIPLE_CHOICES
+            - 301 MOVED_PERMANENTLY
+            - 302 FOUND
+            - 302 MOVED_TEMPORARILY
+            - 303 SEE_OTHER
+            - 304 NOT_MODIFIED
+            - 305 USE_PROXY
+            - 307 TEMPORARY_REDIRECT
+            - 308 PERMANENT_REDIRECT
+            - 400 BAD_REQUEST
+            - 401 UNAUTHORIZED
+            - 402 PAYMENT_REQUIRED
+            - 403 FORBIDDEN
+            - 404 NOT_FOUND
+            - 405 METHOD_NOT_ALLOWED
+            - 406 NOT_ACCEPTABLE
+            - 407 PROXY_AUTHENTICATION_REQUIRED
+            - 408 REQUEST_TIMEOUT
+            - 409 CONFLICT
+            - 410 GONE
+            - 411 LENGTH_REQUIRED
+            - 412 PRECONDITION_FAILED
+            - 413 PAYLOAD_TOO_LARGE
+            - 413 REQUEST_ENTITY_TOO_LARGE
+            - 414 URI_TOO_LONG
+            - 414 REQUEST_URI_TOO_LONG
+            - 415 UNSUPPORTED_MEDIA_TYPE
+            - 416 REQUESTED_RANGE_NOT_SATISFIABLE
+            - 417 EXPECTATION_FAILED
+            - 418 I_AM_A_TEAPOT
+            - 419 INSUFFICIENT_SPACE_ON_RESOURCE
+            - 420 METHOD_FAILURE
+            - 421 DESTINATION_LOCKED
+            - 422 UNPROCESSABLE_ENTITY
+            - 423 LOCKED
+            - 424 FAILED_DEPENDENCY
+            - 425 TOO_EARLY
+            - 426 UPGRADE_REQUIRED
+            - 428 PRECONDITION_REQUIRED
+            - 429 TOO_MANY_REQUESTS
+            - 431 REQUEST_HEADER_FIELDS_TOO_LARGE
+            - 451 UNAVAILABLE_FOR_LEGAL_REASONS
+            - 500 INTERNAL_SERVER_ERROR
+            - 501 NOT_IMPLEMENTED
+            - 502 BAD_GATEWAY
+            - 503 SERVICE_UNAVAILABLE
+            - 504 GATEWAY_TIMEOUT
+            - 505 HTTP_VERSION_NOT_SUPPORTED
+            - 506 VARIANT_ALSO_NEGOTIATES
+            - 507 INSUFFICIENT_STORAGE
+            - 508 LOOP_DETECTED
+            - 509 BANDWIDTH_LIMIT_EXCEEDED
+            - 510 NOT_EXTENDED
+            - 511 NETWORK_AUTHENTICATION_REQUIRED
+        userMessage:
+          type: string
+        message:
+          type: string
+        suppressed:
+          type: array
+          items:
+            type: object
+            properties:
+              stackTrace:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    classLoaderName:
+                      type: string
+                    moduleName:
+                      type: string
+                    moduleVersion:
+                      type: string
+                    methodName:
+                      type: string
+                    fileName:
+                      type: string
+                    lineNumber:
+                      type: integer
+                      format: int32
+                    className:
+                      type: string
+                    nativeMethod:
+                      type: boolean
+              message:
+                type: string
+              localizedMessage:
+                type: string
+        localizedMessage:
+          type: string
+    AssemblyProductForOrderFromShoppingCartRequest:
+      required:
+        - orderId
+        - shoppingCartId
+      type: object
+      properties:
+        shoppingCartId:
+          type: string
+          description: Идентификатор корзины в БД
+          format: uuid
+          example: 53aa35c8-e659-44b2-882f-f6056e443c99
+        orderId:
+          type: string
+          description: Идентификатор заказа в БД
+          format: uuid
+          example: bbaa35c8-e659-44b2-882f-f6056e443c99
+      description: >-
+        Запрос на сбор заказа из ранее зарезервированных товаров из корзины к
+        заказу.
+    NoSpecifiedProductInWarehouseException:
+      type: object
+      properties:
+        cause:
+          type: object
+          properties:
+            stackTrace:
+              type: array
+              items:
+                type: object
+                properties:
+                  classLoaderName:
+                    type: string
+                  moduleName:
+                    type: string
+                  moduleVersion:
+                    type: string
+                  methodName:
+                    type: string
+                  fileName:
+                    type: string
+                  lineNumber:
+                    type: integer
+                    format: int32
+                  className:
+                    type: string
+                  nativeMethod:
+                    type: boolean
+            message:
+              type: string
+            localizedMessage:
+              type: string
+        stackTrace:
+          type: array
+          items:
+            type: object
+            properties:
+              classLoaderName:
+                type: string
+              moduleName:
+                type: string
+              moduleVersion:
+                type: string
+              methodName:
+                type: string
+              fileName:
+                type: string
+              lineNumber:
+                type: integer
+                format: int32
+              className:
+                type: string
+              nativeMethod:
+                type: boolean
+        httpStatus:
+          type: string
+          enum:
+            - 100 CONTINUE
+            - 101 SWITCHING_PROTOCOLS
+            - 102 PROCESSING
+            - 103 EARLY_HINTS
+            - 103 CHECKPOINT
+            - 200 OK
+            - 201 CREATED
+            - 202 ACCEPTED
+            - 203 NON_AUTHORITATIVE_INFORMATION
+            - 204 NO_CONTENT
+            - 205 RESET_CONTENT
+            - 206 PARTIAL_CONTENT
+            - 207 MULTI_STATUS
+            - 208 ALREADY_REPORTED
+            - 226 IM_USED
+            - 300 MULTIPLE_CHOICES
+            - 301 MOVED_PERMANENTLY
+            - 302 FOUND
+            - 302 MOVED_TEMPORARILY
+            - 303 SEE_OTHER
+            - 304 NOT_MODIFIED
+            - 305 USE_PROXY
+            - 307 TEMPORARY_REDIRECT
+            - 308 PERMANENT_REDIRECT
+            - 400 BAD_REQUEST
+            - 401 UNAUTHORIZED
+            - 402 PAYMENT_REQUIRED
+            - 403 FORBIDDEN
+            - 404 NOT_FOUND
+            - 405 METHOD_NOT_ALLOWED
+            - 406 NOT_ACCEPTABLE
+            - 407 PROXY_AUTHENTICATION_REQUIRED
+            - 408 REQUEST_TIMEOUT
+            - 409 CONFLICT
+            - 410 GONE
+            - 411 LENGTH_REQUIRED
+            - 412 PRECONDITION_FAILED
+            - 413 PAYLOAD_TOO_LARGE
+            - 413 REQUEST_ENTITY_TOO_LARGE
+            - 414 URI_TOO_LONG
+            - 414 REQUEST_URI_TOO_LONG
+            - 415 UNSUPPORTED_MEDIA_TYPE
+            - 416 REQUESTED_RANGE_NOT_SATISFIABLE
+            - 417 EXPECTATION_FAILED
+            - 418 I_AM_A_TEAPOT
+            - 419 INSUFFICIENT_SPACE_ON_RESOURCE
+            - 420 METHOD_FAILURE
+            - 421 DESTINATION_LOCKED
+            - 422 UNPROCESSABLE_ENTITY
+            - 423 LOCKED
+            - 424 FAILED_DEPENDENCY
+            - 425 TOO_EARLY
+            - 426 UPGRADE_REQUIRED
+            - 428 PRECONDITION_REQUIRED
+            - 429 TOO_MANY_REQUESTS
+            - 431 REQUEST_HEADER_FIELDS_TOO_LARGE
+            - 451 UNAVAILABLE_FOR_LEGAL_REASONS
+            - 500 INTERNAL_SERVER_ERROR
+            - 501 NOT_IMPLEMENTED
+            - 502 BAD_GATEWAY
+            - 503 SERVICE_UNAVAILABLE
+            - 504 GATEWAY_TIMEOUT
+            - 505 HTTP_VERSION_NOT_SUPPORTED
+            - 506 VARIANT_ALSO_NEGOTIATES
+            - 507 INSUFFICIENT_STORAGE
+            - 508 LOOP_DETECTED
+            - 509 BANDWIDTH_LIMIT_EXCEEDED
+            - 510 NOT_EXTENDED
+            - 511 NETWORK_AUTHENTICATION_REQUIRED
+        userMessage:
+          type: string
+        message:
+          type: string
+        suppressed:
+          type: array
+          items:
+            type: object
+            properties:
+              stackTrace:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    classLoaderName:
+                      type: string
+                    moduleName:
+                      type: string
+                    moduleVersion:
+                      type: string
+                    methodName:
+                      type: string
+                    fileName:
+                      type: string
+                    lineNumber:
+                      type: integer
+                      format: int32
+                    className:
+                      type: string
+                    nativeMethod:
+                      type: boolean
+              message:
+                type: string
+              localizedMessage:
+                type: string
+        localizedMessage:
+          type: string
+    AddProductToWarehouseRequest:
+      required:
+        - quantity
+      type: object
+      properties:
+        productId:
+          type: string
+          description: Идентификатор товара в БД
+          format: uuid
+          example: 53aa35c8-e659-44b2-882f-f6056e443c99
+        quantity:
+          minimum: 1
+          type: integer
+          description: Количество единиц товара для добавления на склад
+          format: int64
+      description: Запрос на увеличение единиц товара по его идентификатору
+    AddressDto:
+      type: object
+      properties:
+        country:
+          type: string
+          description: Страна.
+        city:
+          type: string
+          description: Город.
+        street:
+          type: string
+          description: Улица.
+        house:
+          type: string
+          description: Дом.
+        flat:
+          type: string
+          description: Квартира.
+      description: Представление адреса в системе.

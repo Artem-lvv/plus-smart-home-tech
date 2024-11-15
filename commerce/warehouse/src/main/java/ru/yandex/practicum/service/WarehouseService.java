@@ -1,21 +1,27 @@
 package ru.yandex.practicum.service;
 
-import org.springframework.http.ResponseEntity;
-import ru.yandex.practicum.model.AddProductToWarehouseRequest;
-import ru.yandex.practicum.model.AddressDto;
-import ru.yandex.practicum.model.BookedProductsDto;
-import ru.yandex.practicum.model.NewProductInWarehouseRequest;
-import ru.yandex.practicum.model.ShoppingCartDto;
+import ru.yandex.practicum.warehouse_api.model.AddProductToWarehouseRequest;
+import ru.yandex.practicum.warehouse_api.model.AddressDto;
+import ru.yandex.practicum.warehouse_api.model.AssemblyProductForOrderFromShoppingCartRequest;
+import ru.yandex.practicum.warehouse_api.model.BookedProductsDto;
+import ru.yandex.practicum.warehouse_api.model.NewProductInWarehouseRequest;
+import ru.yandex.practicum.warehouse_api.model.ShoppingCartDto;
+
+import java.util.List;
+import java.util.Map;
 
 public interface WarehouseService {
-    void newProductInWarehouse(NewProductInWarehouseRequest newProductInWarehouseRequest2,
-                          NewProductInWarehouseRequest newProductInWarehouseRequest);
+    void newProductInWarehouse(NewProductInWarehouseRequest newProductInWarehouseRequest);
 
 
     AddressDto getWarehouseAddress();
 
-    void addProductToWarehouse(AddProductToWarehouseRequest addProductToWarehouseRequestBody,
-                                               AddProductToWarehouseRequest addProductToWarehouseRequest);
+    void addProductToWarehouse(AddProductToWarehouseRequest addProductToWarehouseRequestBody);
 
-    BookedProductsDto bookingProductForShoppingCart(ShoppingCartDto shoppingCartDto, ShoppingCartDto shoppingCart);
+    BookedProductsDto bookingProductForShoppingCart(ShoppingCartDto shoppingCartDto);
+
+    BookedProductsDto assemblyProductForOrderFromShoppingCart(
+            AssemblyProductForOrderFromShoppingCartRequest assemblyProductForOrderFromShoppingCartRequest);
+
+    void acceptReturn(Map<String, Long> requestBody, List<Object> products);
 }

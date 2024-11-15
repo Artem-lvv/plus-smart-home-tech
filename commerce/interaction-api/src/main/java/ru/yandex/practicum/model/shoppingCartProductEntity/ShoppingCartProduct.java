@@ -1,9 +1,9 @@
-package ru.yandex.practicum.model.entity.shoppingCartProduct;
+package ru.yandex.practicum.model.shoppingCartProductEntity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ru.yandex.practicum.model.entity.product.Product;
-import ru.yandex.practicum.model.entity.shoppingCart.ShoppingCart;
+import ru.yandex.practicum.model.productEntity.Product;
+import ru.yandex.practicum.model.shoppingCartEntity.ShoppingCart;
 
 import java.time.LocalDateTime;
 import java.util.Objects;

@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.UUID;
 
@@ -18,6 +19,7 @@ import java.util.UUID;
 @Setter
 @Builder
 @Entity
+@ToString
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Table(name = "reserved_products")

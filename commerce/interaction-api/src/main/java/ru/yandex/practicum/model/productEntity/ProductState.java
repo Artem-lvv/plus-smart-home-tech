@@ -1,16 +1,14 @@
-package ru.yandex.practicum.model.entity.product;
+package ru.yandex.practicum.model.productEntity;
 
-public enum ProductCategory {
+public enum ProductState {
   
-  LIGHTING("LIGHTING"),
+  ACTIVE("ACTIVE"),
   
-  CONTROL("CONTROL"),
-  
-  SENSORS("SENSORS");
+  DEACTIVATE("DEACTIVATE");
 
   private String value;
 
-  ProductCategory(String value) {
+  ProductState(String value) {
     this.value = value;
   }
 
@@ -23,8 +21,8 @@ public enum ProductCategory {
     return String.valueOf(value);
   }
 
-  public static ProductCategory fromValue(String value) {
-    for (ProductCategory b : ProductCategory.values()) {
+  public static ProductState fromValue(String value) {
+    for (ProductState b : ProductState.values()) {
       if (b.value.equals(value)) {
         return b;
       }

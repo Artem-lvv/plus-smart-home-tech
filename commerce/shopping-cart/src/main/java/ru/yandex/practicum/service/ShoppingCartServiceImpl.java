@@ -2,23 +2,25 @@ package ru.yandex.practicum.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.exception.MethodArgumentNotValidException;
 import ru.yandex.practicum.exception.ProductIdUnauthorizedException;
-import ru.yandex.practicum.model.BookedProductsDto;
-import ru.yandex.practicum.model.ChangeProductQuantityRequest;
-import ru.yandex.practicum.model.ProductDto;
-import ru.yandex.practicum.model.ShoppingCartDto;
-import ru.yandex.practicum.model.entity.product.Product;
-import ru.yandex.practicum.model.entity.shoppingCart.ShoppingCart;
-import ru.yandex.practicum.model.entity.shoppingCartProduct.ShoppingCartProduct;
-import ru.yandex.practicum.model.entity.shoppingCartProduct.ShoppingCartProductId;
+import ru.yandex.practicum.model.productEntity.Product;
+import ru.yandex.practicum.model.shoppingCartEntity.ShoppingCart;
+import ru.yandex.practicum.model.shoppingCartProductEntity.ShoppingCartProduct;
+import ru.yandex.practicum.model.shoppingCartProductEntity.ShoppingCartProductId;
 import ru.yandex.practicum.repository.ProductRepository;
 import ru.yandex.practicum.repository.ShoppingCartProductRepository;
 import ru.yandex.practicum.repository.ShoppingCartRepository;
+import ru.yandex.practicum.shopping_cart_api.model.BookedProductsDto;
+import ru.yandex.practicum.shopping_cart_api.model.ChangeProductQuantityRequest;
+import ru.yandex.practicum.shopping_cart_api.model.ProductDto;
+import ru.yandex.practicum.shopping_cart_api.model.ShoppingCartDto;
+import ru.yandex.practicum.warehouse_api.api.WarehouseApiClient;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -37,15 +39,14 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     private final ShoppingCartRepository shoppingCartRepository;
     private final ShoppingCartProductRepository shoppingCartProductRepository;
     private final ProductRepository productRepository;
+    private final WarehouseApiClient warehouseApiClient;
 
     @Qualifier("mvcConversionService")
     private final ConversionService cs;
 
     @Override
     @Transactional
-    public ShoppingCartDto addProductToShoppingCart(String username,
-                                                    Map<String, Long> requestBody,
-                                                    List<String> products) {
+    public ShoppingCartDto addProductToShoppingCart(String username, Map<String, Long> requestBody) {
 
         checkUsername(username);
         ShoppingCart shoppingCart = getShoppingCartEntity(username);
@@ -90,8 +91,10 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         Map<String, Long> uuidProductToQuantity = currentCartUuidProductToShopCartProduct.entrySet()
                 .stream()
                 .collect(Collectors.toMap(
-                        uuidShoppingCartProductEntityEntry1 -> uuidShoppingCartProductEntityEntry1.getKey().toString(),
-                        uuidShoppingCartProductEntityEntry -> Integer.toUnsignedLong(uuidShoppingCartProductEntityEntry
+                        uuidShoppingCartProductEntityEntry1
+                                -> uuidShoppingCartProductEntityEntry1.getKey().toString(),
+                        uuidShoppingCartProductEntityEntry
+                                -> Integer.toUnsignedLong(uuidShoppingCartProductEntityEntry
                                 .getValue().getQuantity())));
 
         ShoppingCartDto shoppingCartDto = new ShoppingCartDto(shoppingCart.getShoppingCartId(),
@@ -139,13 +142,26 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Override
     public BookedProductsDto bookingProductsFromShoppingCart(String username) {
 
+        ShoppingCartDto shoppingCartDto = getShoppingCart(username);
+//        ResponseEntity<BookedProductsDto> bookedProductsDtoResponseEntity = warehouseClient
+//                .bookingProductForShoppingCart(shoppingCartDto, shoppingCartDto);
+
+//        ru.yandex.practicum.client.model.ShoppingCartDto shoppingCartDtoClient =
+//                new ru.yandex.practicum.client.model.ShoppingCartDto(shoppingCartDto.getShoppingCartId(),
+//                        shoppingCartDto.getProducts());
+
+//        ResponseEntity<ru.yandex.practicum.client.model.BookedProductsDto> bookedProductsDtoResponseEntity
+//                = apiWarehouseClient.bookingProductForShoppingCart(shoppingCartDtoClient, shoppingCartDtoClient);
+
+//        val bookedProductsDto = warehouseApiClient.bookingProductForShoppingCart(shoppingCartDto);
+
+
         return null;
     }
 
     @Override
     @Transactional
     public ProductDto changeProductQuantity(String username,
-                                            ChangeProductQuantityRequest changeProductQuantityRequest2,
                                             ChangeProductQuantityRequest changeProductQuantityRequest) {
 
         checkUsername(username);
@@ -210,9 +226,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     @Override
     @Transactional
-    public ShoppingCartDto removeFromShoppingCart(String username,
-                                                  Map<String, Long> requestBody,
-                                                  List<String> products) {
+    public ShoppingCartDto removeFromShoppingCart(String username, Map<String, Long> requestBody) {
 
         checkUsername(username);
         Optional<ShoppingCart> shoppingCart = shoppingCartRepository.findByUsernameAndDeactivatedFalse(username);

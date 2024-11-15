@@ -1,4 +1,4 @@
-package ru.yandex.practicum.model.entity.shoppingCart;
+package ru.yandex.practicum.model.shoppingCartEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

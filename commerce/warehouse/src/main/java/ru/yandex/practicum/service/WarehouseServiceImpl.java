@@ -10,21 +10,24 @@ import ru.yandex.practicum.condig.AddressWarehouse;
 import ru.yandex.practicum.entity.Dimension;
 import ru.yandex.practicum.entity.ProductInWarehouse;
 import ru.yandex.practicum.entity.ReservedProduct;
+import ru.yandex.practicum.entity.model.ProductIdToAvailableStock;
 import ru.yandex.practicum.exception.DuplicateEntityException;
 import ru.yandex.practicum.exception.EntityNotFoundException;
 import ru.yandex.practicum.exception.NotEnoughProductInStockException;
-import ru.yandex.practicum.model.AddProductToWarehouseRequest;
-import ru.yandex.practicum.model.AddressDto;
-import ru.yandex.practicum.model.BookedProductsDto;
-import ru.yandex.practicum.model.NewProductInWarehouseRequest;
-import ru.yandex.practicum.model.ShoppingCartDto;
 import ru.yandex.practicum.repository.ProductInWarehouseRepository;
 import ru.yandex.practicum.repository.ProductRepository;
 import ru.yandex.practicum.repository.ReservedProductRepository;
+import ru.yandex.practicum.warehouse_api.model.AddProductToWarehouseRequest;
+import ru.yandex.practicum.warehouse_api.model.AddressDto;
+import ru.yandex.practicum.warehouse_api.model.AssemblyProductForOrderFromShoppingCartRequest;
+import ru.yandex.practicum.warehouse_api.model.BookedProductsDto;
+import ru.yandex.practicum.warehouse_api.model.NewProductInWarehouseRequest;
+import ru.yandex.practicum.warehouse_api.model.ShoppingCartDto;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -46,8 +49,7 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     @Override
     @Transactional
-    public void newProductInWarehouse(NewProductInWarehouseRequest newProductInWarehouseRequestBody,
-                                      NewProductInWarehouseRequest newProductInWarehouseRequest) {
+    public void newProductInWarehouse(NewProductInWarehouseRequest newProductInWarehouseRequestBody) {
 
         Optional<ProductInWarehouse> byProductProductId = productInWarehouseRepository
                 .findByProduct_ProductId(newProductInWarehouseRequestBody.getProductId());
@@ -80,19 +82,18 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     @Override
     @Transactional
-    public void addProductToWarehouse(AddProductToWarehouseRequest addProductToWarehouseRequestBody,
-                                      AddProductToWarehouseRequest addProductToWarehouseRequest) {
+    public void addProductToWarehouse(AddProductToWarehouseRequest addProductToWarehouseRequest) {
 
         Optional<ProductInWarehouse> byProductProductId = productInWarehouseRepository
-                .findByProduct_ProductId(addProductToWarehouseRequestBody.getProductId());
+                .findByProduct_ProductId(addProductToWarehouseRequest.getProductId());
 
         if (byProductProductId.isEmpty()) {
-            log.info("Exception EntityNotFoundException {}", addProductToWarehouseRequestBody);
-            throw new EntityNotFoundException("Product", addProductToWarehouseRequestBody.getProductId().toString());
+            log.info("Exception EntityNotFoundException {}", addProductToWarehouseRequest);
+            throw new EntityNotFoundException("Product", addProductToWarehouseRequest.getProductId().toString());
         }
 
         byProductProductId.get().setAvailableStock(byProductProductId.get().getAvailableStock()
-                + addProductToWarehouseRequestBody.getQuantity().intValue());
+                + addProductToWarehouseRequest.getQuantity().intValue());
 
         productInWarehouseRepository.save(byProductProductId.get());
         log.info("Update field AvailableStock product in warehouse {}", byProductProductId.get());
@@ -100,8 +101,7 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     @Override
     @Transactional
-    public BookedProductsDto bookingProductForShoppingCart(ShoppingCartDto shoppingCartDto,
-                                                           ShoppingCartDto shoppingCart) {
+    public BookedProductsDto bookingProductForShoppingCart(ShoppingCartDto shoppingCartDto) {
 
         Map<UUID, Long> reservationProducts = shoppingCartDto.getProducts().entrySet()
                 .stream()
@@ -109,35 +109,102 @@ public class WarehouseServiceImpl implements WarehouseService {
                         Map.Entry::getValue));
 
         Map<UUID, Long> availableStock = productInWarehouseRepository.findAvailableStock(reservationProducts.keySet()
+                        .stream()
+                        .toList())
                 .stream()
-                .toList());
+                .collect(Collectors.toMap(ProductIdToAvailableStock::getProductId,
+                        ProductIdToAvailableStock::getAvailableStock));
 
-        List<ReservedProduct> toReservation = new ArrayList<>();
-
-        reservationProducts.forEach((uuidProduct, requiredQuantity) -> {
-            Long available = availableStock.get(uuidProduct);
-            if (available < requiredQuantity) {
-                throw new NotEnoughProductInStockException(uuidProduct.toString(), available - requiredQuantity);
-            } else {
-                toReservation.add(ReservedProduct.builder()
-                        .shoppingCartId(shoppingCartDto.getShoppingCartId())
-                        .productId(uuidProduct)
-                        .reservedQuantity(requiredQuantity)
-                        .build());
-            }
-        });
+        List<ReservedProduct> toReservation = getReservedProducts(shoppingCartDto, reservationProducts, availableStock);
 
         reservedProductRepository.saveAll(toReservation);
         log.info("Create ReservedProduct {}", toReservation);
 
+        List<UUID> productIds = toReservation
+                .stream()
+                .map(ReservedProduct::getProductId)
+                .toList();
+
         Map<UUID, ProductInWarehouse> productIdToPIW = productInWarehouseRepository
-                .findAllByProductId_Fetch(toReservation
-                        .stream()
-                        .map(ReservedProduct::getProductId)
-                        .toList())
+                .findAllByProductId_Fetch(productIds)
                 .stream()
                 .collect(Collectors.toMap(productInWarehouse -> productInWarehouse.getProduct().getProductId(),
                         productInWarehouse -> productInWarehouse));
+
+        return getBookedProductsDto(productIdToPIW, reservationProducts);
+    }
+
+    @Override
+    @Transactional
+    public BookedProductsDto assemblyProductForOrderFromShoppingCart(
+            AssemblyProductForOrderFromShoppingCartRequest assemblyProductForOrderFromShoppingCartRequestBody) {
+
+        UUID shoppingCartId = assemblyProductForOrderFromShoppingCartRequestBody.getShoppingCartId();
+
+        List<ReservedProduct> reservedProductsByShopCartID = reservedProductRepository
+                .findAllByShoppingCartId(shoppingCartId);
+
+        List<UUID> productIds = reservedProductsByShopCartID
+                .stream()
+                .map(ReservedProduct::getProductId)
+                .toList();
+
+        Map<UUID, ProductInWarehouse> allPIW_byProductIds = productInWarehouseRepository
+                .findAllByProductId_Fetch(productIds)
+                .stream()
+                .collect(Collectors.toMap(productInWarehouse -> productInWarehouse.getProduct().getProductId(),
+                        productInWarehouse -> productInWarehouse));
+
+        reservedProductsByShopCartID.forEach(reservedProduct -> {
+            ProductInWarehouse productInWarehouse = allPIW_byProductIds.get(reservedProduct.getProductId());
+            if (Objects.isNull(productInWarehouse)) {
+                throw new EntityNotFoundException("Product", reservedProduct.getProductId().toString());
+            }
+            productInWarehouse.setAvailableStock(productInWarehouse.getAvailableStock()
+                    - reservedProduct.getReservedQuantity());
+        });
+
+        productInWarehouseRepository.saveAll(allPIW_byProductIds.values());
+        log.info("Update ProductInWarehouse {}", allPIW_byProductIds);
+
+        reservedProductRepository.deleteAll(reservedProductsByShopCartID);
+        log.info("Delete ReservedProduct {}", reservedProductsByShopCartID);
+
+        Map<UUID, Long> reservationProducts = reservedProductsByShopCartID.stream()
+                .collect(Collectors.toMap(ReservedProduct::getProductId,
+                        ReservedProduct::getReservedQuantity));
+
+        return getBookedProductsDto(allPIW_byProductIds, reservationProducts);
+    }
+
+    @Override
+    @Transactional
+    public void acceptReturn(Map<String, Long> requestBody, List<Object> products) {
+        List<UUID> productIds = requestBody.keySet()
+                .stream()
+                .map(UUID::fromString)
+                .toList();
+
+        Map<UUID, ProductInWarehouse> allPIW_byProductIds = productInWarehouseRepository
+                .findAllByProductId_Fetch(productIds)
+                .stream()
+                .collect(Collectors.toMap(productInWarehouse -> productInWarehouse.getProduct().getProductId(),
+                        productInWarehouse -> productInWarehouse));
+
+        requestBody.entrySet().forEach(entry -> {
+            ProductInWarehouse productInWarehouse = allPIW_byProductIds.get(UUID.fromString(entry.getKey()));
+            if (Objects.isNull(productInWarehouse)) {
+                throw new EntityNotFoundException("Product", entry.getKey());
+            }
+            productInWarehouse.setAvailableStock(productInWarehouse.getAvailableStock() + entry.getValue());
+        });
+
+        productInWarehouseRepository.saveAll(allPIW_byProductIds.values());
+        log.info("Update ProductInWarehouse {}", allPIW_byProductIds);
+    }
+
+    private BookedProductsDto getBookedProductsDto(Map<UUID, ProductInWarehouse> productIdToPIW,
+                                                   Map<UUID, Long> reservationProducts) {
 
         AtomicReference<Double> weight = new AtomicReference<>(0.0);
         AtomicReference<Double> volume = new AtomicReference<>(0.0);
@@ -148,16 +215,43 @@ public class WarehouseServiceImpl implements WarehouseService {
             fragile.set(productInWarehouse.getFragile());
             weight.updateAndGet(v -> v + productInWarehouse.getWeight() * quantity);
             Dimension dimension = productInWarehouse.getDimension();
-            volume.updateAndGet(v -> v + dimension.getHeight() * dimension.getWidth() * dimension.getDepth());
+            volume.updateAndGet(v -> v
+                    + (dimension.getHeight() * dimension.getWidth() * dimension.getDepth()) * quantity);
         });
 
         BookedProductsDto bookedProductsDto = new BookedProductsDto();
         bookedProductsDto.setDeliveryWeight(weight.get());
         bookedProductsDto.setDeliveryVolume(volume.get());
         bookedProductsDto.setFragile(fragile.get());
-
         log.info("Create BookedProductsDto {}", bookedProductsDto);
 
         return bookedProductsDto;
+    }
+
+    private static List<ReservedProduct> getReservedProducts(ShoppingCartDto shoppingCartDto,
+                                                             Map<UUID, Long> reservationProducts,
+                                                             Map<UUID, Long> availableStock) {
+        List<ReservedProduct> toReservation = new ArrayList<>();
+
+        for (Map.Entry<UUID, Long> entry : reservationProducts.entrySet()) {
+            UUID uuidProduct = entry.getKey();
+            Long requiredQuantity = entry.getValue();
+            Long available = availableStock.get(uuidProduct);
+
+            if (Objects.isNull(available)) {
+                throw new EntityNotFoundException("ProductInWarehouse", uuidProduct.toString());
+            }
+
+            if (available < requiredQuantity) {
+                throw new NotEnoughProductInStockException(uuidProduct.toString(), available - requiredQuantity);
+            } else {
+                toReservation.add(ReservedProduct.builder()
+                        .shoppingCartId(shoppingCartDto.getShoppingCartId())
+                        .productId(uuidProduct)
+                        .reservedQuantity(requiredQuantity)
+                        .build());
+            }
+        }
+        return toReservation;
     }
 }

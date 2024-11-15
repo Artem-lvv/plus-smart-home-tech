@@ -1,4 +1,4 @@
-package ru.yandex.practicum.model.entity.shoppingCartProduct;
+package ru.yandex.practicum.model.shoppingCartProductEntity;
 
 import jakarta.persistence.Embeddable;
 import lombok.*;

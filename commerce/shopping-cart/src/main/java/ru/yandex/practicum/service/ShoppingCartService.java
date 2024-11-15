@@ -1,29 +1,24 @@
 package ru.yandex.practicum.service;
 
-import ru.yandex.practicum.model.BookedProductsDto;
-import ru.yandex.practicum.model.ChangeProductQuantityRequest;
-import ru.yandex.practicum.model.ProductDto;
-import ru.yandex.practicum.model.ShoppingCartDto;
 
-import java.util.List;
+
+import ru.yandex.practicum.shopping_cart_api.model.BookedProductsDto;
+import ru.yandex.practicum.shopping_cart_api.model.ChangeProductQuantityRequest;
+import ru.yandex.practicum.shopping_cart_api.model.ProductDto;
+import ru.yandex.practicum.shopping_cart_api.model.ShoppingCartDto;
+
 import java.util.Map;
 
 public interface ShoppingCartService {
-    ShoppingCartDto addProductToShoppingCart(String username,
-                                             Map<String, Long> requestBody,
-                                             List<String> products);
+    ShoppingCartDto addProductToShoppingCart(String username, Map<String, Long> requestBody);
 
     BookedProductsDto bookingProductsFromShoppingCart(String username);
-
-    ProductDto changeProductQuantity(String username,
-                                      ChangeProductQuantityRequest changeProductQuantityRequest2,
-                                      ChangeProductQuantityRequest changeProductQuantityRequest);
+//
+    ProductDto changeProductQuantity(String username, ChangeProductQuantityRequest changeProductQuantityRequest);
 
     void deactivateCurrentShoppingCart(String username);
 
     ShoppingCartDto getShoppingCart(String username);
 
-    ShoppingCartDto removeFromShoppingCart(String username,
-                                            Map<String, Long> requestBody,
-                                            List<String> products);
+    ShoppingCartDto removeFromShoppingCart(String username, Map<String, Long> requestBody);
 }

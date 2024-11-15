@@ -4,41 +4,48 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.api.ApiApiDelegate;
-import ru.yandex.practicum.model.AddProductToWarehouseRequest;
-import ru.yandex.practicum.model.AddressDto;
-import ru.yandex.practicum.model.AssemblyProductForOrderFromShoppingCartRequest;
-import ru.yandex.practicum.model.BookedProductsDto;
-import ru.yandex.practicum.model.NewProductInWarehouseRequest;
-import ru.yandex.practicum.model.ShoppingCartDto;
 import ru.yandex.practicum.service.WarehouseService;
+import ru.yandex.practicum.warehouse_api.api.WarehouseApiDelegate;
+import ru.yandex.practicum.warehouse_api.model.AddProductToWarehouseRequest;
+import ru.yandex.practicum.warehouse_api.model.AddressDto;
+import ru.yandex.practicum.warehouse_api.model.AssemblyProductForOrderFromShoppingCartRequest;
+import ru.yandex.practicum.warehouse_api.model.BookedProductsDto;
+import ru.yandex.practicum.warehouse_api.model.NewProductInWarehouseRequest;
+import ru.yandex.practicum.warehouse_api.model.ShoppingCartDto;
+
+import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class ApiApiDelegateImpl implements ApiApiDelegate {
+public class ApiApiDelegateImpl implements WarehouseApiDelegate {
     private final WarehouseService warehouseService;
 
     @Override
-    public ResponseEntity<Void> addProductToWarehouse(AddProductToWarehouseRequest addProductToWarehouseRequest2,
-                                                      AddProductToWarehouseRequest addProductToWarehouseRequest) {
+    public ResponseEntity<Void> acceptReturn(Map<String, Long> requestBody, List<Object> products) {
+        warehouseService.acceptReturn(requestBody, products);
+        return ResponseEntity.ok().build();
+    }
 
-        warehouseService.addProductToWarehouse(addProductToWarehouseRequest2, addProductToWarehouseRequest);
+    @Override
+    public ResponseEntity<Void> addProductToWarehouse(AddProductToWarehouseRequest addProductToWarehouseRequest) {
 
+        warehouseService.addProductToWarehouse(addProductToWarehouseRequest);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<BookedProductsDto> assemblyProductForOrderFromShoppingCart(
-            AssemblyProductForOrderFromShoppingCartRequest assemblyProductForOrderFromShoppingCartRequest2,
             AssemblyProductForOrderFromShoppingCartRequest assemblyProductForOrderFromShoppingCartRequest) {
 
-        return ApiApiDelegate.super.assemblyProductForOrderFromShoppingCart(assemblyProductForOrderFromShoppingCartRequest2, assemblyProductForOrderFromShoppingCartRequest);
+        return new ResponseEntity<>(warehouseService
+                .assemblyProductForOrderFromShoppingCart(assemblyProductForOrderFromShoppingCartRequest),
+                HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<BookedProductsDto> bookingProductForShoppingCart(ShoppingCartDto shoppingCartDto,
-                                                                           ShoppingCartDto shoppingCart) {
-        return new ResponseEntity<>(warehouseService.bookingProductForShoppingCart(shoppingCartDto, shoppingCart),
+    public ResponseEntity<BookedProductsDto> bookingProductForShoppingCart(ShoppingCartDto shoppingCartDto) {
+        return new ResponseEntity<>(warehouseService.bookingProductForShoppingCart(shoppingCartDto),
                 HttpStatus.OK);
     }
 
@@ -48,10 +55,9 @@ public class ApiApiDelegateImpl implements ApiApiDelegate {
     }
 
     @Override
-    public ResponseEntity<Void> newProductInWarehouse(NewProductInWarehouseRequest newProductInWarehouseRequest2,
-                                                      NewProductInWarehouseRequest newProductInWarehouseRequest) {
+    public ResponseEntity<Void> newProductInWarehouse(NewProductInWarehouseRequest newProductInWarehouseRequest) {
 
-        warehouseService.newProductInWarehouse(newProductInWarehouseRequest2, newProductInWarehouseRequest);
-        return new ResponseEntity<>(HttpStatus.OK);
+        warehouseService.newProductInWarehouse(newProductInWarehouseRequest);
+        return ResponseEntity.ok().build();
     }
 }

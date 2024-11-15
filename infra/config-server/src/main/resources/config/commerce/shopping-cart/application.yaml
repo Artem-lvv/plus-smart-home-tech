@@ -17,3 +17,6 @@ spring:
 
 server:
   port: 41877
+
+api:
+  name: warehouse-service # Имя сервиса в Eureka

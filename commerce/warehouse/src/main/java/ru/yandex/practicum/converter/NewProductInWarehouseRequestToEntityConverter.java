@@ -4,7 +4,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.entity.Dimension;
 import ru.yandex.practicum.entity.ProductInWarehouse;
-import ru.yandex.practicum.model.NewProductInWarehouseRequest;
+import ru.yandex.practicum.warehouse_api.model.NewProductInWarehouseRequest;
 
 @Component
 public class NewProductInWarehouseRequestToEntityConverter implements Converter<NewProductInWarehouseRequest,

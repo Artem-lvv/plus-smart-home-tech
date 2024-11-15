@@ -4,28 +4,25 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.api.ApiApiDelegate;
-import ru.yandex.practicum.model.BookedProductsDto;
-import ru.yandex.practicum.model.ChangeProductQuantityRequest;
-import ru.yandex.practicum.model.ProductDto;
-import ru.yandex.practicum.model.ShoppingCartDto;
 import ru.yandex.practicum.service.ShoppingCartService;
+import ru.yandex.practicum.shopping_cart_api.api.ShoppingCartApiDelegate;
+import ru.yandex.practicum.shopping_cart_api.model.BookedProductsDto;
+import ru.yandex.practicum.shopping_cart_api.model.ChangeProductQuantityRequest;
+import ru.yandex.practicum.shopping_cart_api.model.ProductDto;
+import ru.yandex.practicum.shopping_cart_api.model.ShoppingCartDto;
 
 import java.util.List;
 import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class ApiApiDelegateImpl implements ApiApiDelegate {
+public class ApiApiDelegateImpl implements ShoppingCartApiDelegate {
     private final ShoppingCartService shoppingCartService;
 
     @Override
-    public ResponseEntity<ShoppingCartDto> addProductToShoppingCart(String username,
-                                                                    Map<String, Long> requestBody,
-                                                                    List<String> products) {
+    public ResponseEntity<ShoppingCartDto> addProductToShoppingCart(String username, Map<String, Long> requestBody) {
 
-        return new ResponseEntity<>(shoppingCartService.addProductToShoppingCart(username,
-                requestBody, products), HttpStatus.OK);
+        return new ResponseEntity<>(shoppingCartService.addProductToShoppingCart(username, requestBody), HttpStatus.OK);
     }
 
     @Override
@@ -35,11 +32,10 @@ public class ApiApiDelegateImpl implements ApiApiDelegate {
 
     @Override
     public ResponseEntity<ProductDto> changeProductQuantity(String username,
-                                                            ChangeProductQuantityRequest changeProductQuantityRequest2,
                                                             ChangeProductQuantityRequest changeProductQuantityRequest) {
 
         return new ResponseEntity<>(shoppingCartService.changeProductQuantity(username,
-                changeProductQuantityRequest, changeProductQuantityRequest2),
+                changeProductQuantityRequest),
                 HttpStatus.OK);
     }
 
@@ -55,10 +51,8 @@ public class ApiApiDelegateImpl implements ApiApiDelegate {
     }
 
     @Override
-    public ResponseEntity<ShoppingCartDto> removeFromShoppingCart(String username,
-                                                                  Map<String, Long> requestBody,
-                                                                  List<String> products) {
-        return new ResponseEntity<>(shoppingCartService.removeFromShoppingCart(username, requestBody, products),
+    public ResponseEntity<ShoppingCartDto> removeFromShoppingCart(String username, Map<String, Long> requestBody) {
+        return new ResponseEntity<>(shoppingCartService.removeFromShoppingCart(username, requestBody),
                 HttpStatus.OK);
     }
 }
