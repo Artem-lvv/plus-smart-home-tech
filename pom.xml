@@ -161,7 +161,8 @@
                     </configuration>
                     <executions>
                         <execution>
-                            <phase>validate</phase> <!-- Фаза, на которой будет запускаться Checkstyle -->
+                            <phase>validate</phase>
+                            <!-- Фаза, на которой будет запускаться Checkstyle -->
                             <goals>
                                 <goal>check</goal>
                             </goals>
