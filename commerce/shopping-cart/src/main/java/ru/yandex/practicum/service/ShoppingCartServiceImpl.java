@@ -135,7 +135,8 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         return shoppingCartProductRepository
                 .findAllById(shoppingCartProductIdList)
                 .stream()
-                .collect(Collectors.toMap(shoppingCartProduct -> shoppingCartProduct.getId().getProductId(),
+                .collect(Collectors.toMap(shoppingCartProduct -> shoppingCartProduct.getId()
+                                .getProductId(),
                         shoppingCartProduct -> shoppingCartProduct));
     }
 
@@ -143,20 +144,17 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     public BookedProductsDto bookingProductsFromShoppingCart(String username) {
 
         ShoppingCartDto shoppingCartDto = getShoppingCart(username);
-//        ResponseEntity<BookedProductsDto> bookedProductsDtoResponseEntity = warehouseClient
-//                .bookingProductForShoppingCart(shoppingCartDto, shoppingCartDto);
+        var shoppingCartDtoWarehouse = new ru.yandex.practicum.warehouse_api.model.ShoppingCartDto(
+                shoppingCartDto.getShoppingCartId(), shoppingCartDto.getProducts());
+        val bookedProductsDtoWarehouse = warehouseApiClient.bookingProductForShoppingCart(shoppingCartDtoWarehouse);
 
-//        ru.yandex.practicum.client.model.ShoppingCartDto shoppingCartDtoClient =
-//                new ru.yandex.practicum.client.model.ShoppingCartDto(shoppingCartDto.getShoppingCartId(),
-//                        shoppingCartDto.getProducts());
+        BookedProductsDto bookedProductsDto = new BookedProductsDto(
+                Objects.requireNonNull(bookedProductsDtoWarehouse.getBody()).getDeliveryWeight(),
+                bookedProductsDtoWarehouse.getBody().getDeliveryWeight(),
+                bookedProductsDtoWarehouse.getBody().getFragile());
+        log.info("Create BookedProductsDto: {}", bookedProductsDto);
 
-//        ResponseEntity<ru.yandex.practicum.client.model.BookedProductsDto> bookedProductsDtoResponseEntity
-//                = apiWarehouseClient.bookingProductForShoppingCart(shoppingCartDtoClient, shoppingCartDtoClient);
-
-//        val bookedProductsDto = warehouseApiClient.bookingProductForShoppingCart(shoppingCartDto);
-
-
-        return new BookedProductsDto();
+        return bookedProductsDto;
     }
 
     @Override
@@ -215,7 +213,8 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                 .stream()
                 .collect(Collectors.toMap(shoppingCartProduct -> shoppingCartProduct.getProduct()
                                 .getProductId().toString(),
-                        shoppingCartProduct -> Integer.toUnsignedLong(shoppingCartProduct.getQuantity())));
+                        shoppingCartProduct -> Integer.toUnsignedLong(shoppingCartProduct
+                                .getQuantity())));
 
         ShoppingCartDto shoppingCartDto = new ShoppingCartDto(shoppingCart.get().getShoppingCartId(),
                 uuidProductToQuantity);
@@ -235,7 +234,8 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                 .findAllByShoppingCart_ShoppingCartId_Fetch(shoppingCart.get().getShoppingCartId())
                 .stream()
                 .collect(Collectors.toMap(
-                        shoppingCartProduct -> shoppingCartProduct.getProduct().getProductId().toString(),
+                        shoppingCartProduct -> shoppingCartProduct.getProduct().getProductId()
+                                .toString(),
                         shoppingCartProduct -> shoppingCartProduct));
 
         List<ShoppingCartProductId> deletedList = new ArrayList<>(10);

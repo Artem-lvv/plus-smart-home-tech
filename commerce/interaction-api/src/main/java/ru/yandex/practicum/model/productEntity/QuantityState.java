@@ -5,13 +5,9 @@ package ru.yandex.practicum.model.productEntity;
  */
 
 public enum QuantityState {
-  
   ENDED("ENDED"),
-  
   FEW("FEW"),
-  
   ENOUGH("ENOUGH"),
-  
   MANY("MANY");
 
   private String value;

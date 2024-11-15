@@ -1,7 +1,6 @@
 package ru.yandex.practicum.delegate;
 
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,7 +15,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-public class ApiApiDelegateImpl implements ShoppingCartApi {
+public class ShoppingCartController implements ShoppingCartApi {
     private final ShoppingCartService shoppingCartService;
 
     @Override
@@ -47,8 +46,7 @@ public class ApiApiDelegateImpl implements ShoppingCartApi {
 
     @Override
     public ResponseEntity<ShoppingCartDto> getShoppingCart(String username) {
-        val shoppingCart = shoppingCartService.getShoppingCart(username);
-        return new ResponseEntity<>(shoppingCart, HttpStatus.OK);
+        return new ResponseEntity<>(shoppingCartService.getShoppingCart(username), HttpStatus.OK);
     }
 
     @Override

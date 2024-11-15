@@ -149,14 +149,14 @@ public class WarehouseServiceImpl implements WarehouseService {
                 .map(ReservedProduct::getProductId)
                 .toList();
 
-        Map<UUID, ProductInWarehouse> allPIW_byProductIds = productInWarehouseRepository
+        Map<UUID, ProductInWarehouse> productInWarehouseMap = productInWarehouseRepository
                 .findAllByProductId_Fetch(productIds)
                 .stream()
                 .collect(Collectors.toMap(productInWarehouse -> productInWarehouse.getProduct().getProductId(),
                         productInWarehouse -> productInWarehouse));
 
         reservedProductsByShopCartID.forEach(reservedProduct -> {
-            ProductInWarehouse productInWarehouse = allPIW_byProductIds.get(reservedProduct.getProductId());
+            ProductInWarehouse productInWarehouse = productInWarehouseMap.get(reservedProduct.getProductId());
             if (Objects.isNull(productInWarehouse)) {
                 throw new EntityNotFoundException("Product", reservedProduct.getProductId().toString());
             }
@@ -164,8 +164,8 @@ public class WarehouseServiceImpl implements WarehouseService {
                     - reservedProduct.getReservedQuantity());
         });
 
-        productInWarehouseRepository.saveAll(allPIW_byProductIds.values());
-        log.info("Update ProductInWarehouse {}", allPIW_byProductIds);
+        productInWarehouseRepository.saveAll(productInWarehouseMap.values());
+        log.info("Update ProductInWarehouse {}", productInWarehouseMap);
 
         reservedProductRepository.deleteAll(reservedProductsByShopCartID);
         log.info("Delete ReservedProduct {}", reservedProductsByShopCartID);
@@ -174,7 +174,7 @@ public class WarehouseServiceImpl implements WarehouseService {
                 .collect(Collectors.toMap(ReservedProduct::getProductId,
                         ReservedProduct::getReservedQuantity));
 
-        return getBookedProductsDto(allPIW_byProductIds, reservationProducts);
+        return getBookedProductsDto(productInWarehouseMap, reservationProducts);
     }
 
     @Override
@@ -185,22 +185,22 @@ public class WarehouseServiceImpl implements WarehouseService {
                 .map(UUID::fromString)
                 .toList();
 
-        Map<UUID, ProductInWarehouse> allPIW_byProductIds = productInWarehouseRepository
+        Map<UUID, ProductInWarehouse> productInWarehouseMap = productInWarehouseRepository
                 .findAllByProductId_Fetch(productIds)
                 .stream()
                 .collect(Collectors.toMap(productInWarehouse -> productInWarehouse.getProduct().getProductId(),
                         productInWarehouse -> productInWarehouse));
 
         requestBody.entrySet().forEach(entry -> {
-            ProductInWarehouse productInWarehouse = allPIW_byProductIds.get(UUID.fromString(entry.getKey()));
+            ProductInWarehouse productInWarehouse = productInWarehouseMap.get(UUID.fromString(entry.getKey()));
             if (Objects.isNull(productInWarehouse)) {
                 throw new EntityNotFoundException("Product", entry.getKey());
             }
             productInWarehouse.setAvailableStock(productInWarehouse.getAvailableStock() + entry.getValue());
         });
 
-        productInWarehouseRepository.saveAll(allPIW_byProductIds.values());
-        log.info("Update ProductInWarehouse {}", allPIW_byProductIds);
+        productInWarehouseRepository.saveAll(productInWarehouseMap.values());
+        log.info("Update ProductInWarehouse {}", productInWarehouseMap);
     }
 
     private BookedProductsDto getBookedProductsDto(Map<UUID, ProductInWarehouse> productIdToPIW,

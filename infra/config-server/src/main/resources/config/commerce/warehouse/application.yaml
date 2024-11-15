@@ -16,7 +16,8 @@ spring:
         format_sql: true  # Форматирование SQL-запросов для удобочитаемости
 
 server:
-  port: 36017
+  port: 0
+#  port: 36017
 
 address-warehouse:
   country: test
@@ -24,3 +25,6 @@ address-warehouse:
   street: test
   house: test
   flat: test
+
+warehouse:
+  url:

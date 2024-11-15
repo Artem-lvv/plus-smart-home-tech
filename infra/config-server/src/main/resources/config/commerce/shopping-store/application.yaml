@@ -16,4 +16,8 @@ spring:
         format_sql: true  # Форматирование SQL-запросов для удобочитаемости
 
 server:
-  port: 36015
+  port: 0
+#  port: 36015
+
+warehouse:
+  url:

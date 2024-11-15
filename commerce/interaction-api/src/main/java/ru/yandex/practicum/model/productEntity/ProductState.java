@@ -1,9 +1,7 @@
 package ru.yandex.practicum.model.productEntity;
 
 public enum ProductState {
-  
   ACTIVE("ACTIVE"),
-  
   DEACTIVATE("DEACTIVATE");
 
   private String value;

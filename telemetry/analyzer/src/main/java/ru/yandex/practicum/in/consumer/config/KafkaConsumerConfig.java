@@ -22,18 +22,18 @@ import java.util.Map;
 public class KafkaConsumerConfig {
 
     @Value("${spring.kafka.producer.bootstrap-servers}")
-    private String BOOTSTRAP_SERVERS;
+    private String bootstrapServers;
     @Value("${spring.kafka.producer.properties.schema.registry.url}")
-    private String SCHEMA_REGISTRY_URL;
+    private String schemaRegistryUrl;
 
     @Bean
     public ConsumerFactory<String, SensorsSnapshotAvro> avroConsumerFactory() {
         Map<String, Object> configProps = new HashMap<>();
-        configProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
+        configProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configProps.put(ConsumerConfig.GROUP_ID_CONFIG, "analyzer-group");
         configProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         configProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class);
-        configProps.put("schema.registry.url", SCHEMA_REGISTRY_URL);
+        configProps.put("schema.registry.url", schemaRegistryUrl);
         configProps.put("specific.avro.reader", "true"); // Используем специфический Avro-класс
 
         return new DefaultKafkaConsumerFactory<>(configProps);
@@ -50,11 +50,11 @@ public class KafkaConsumerConfig {
     @Bean
     public ConsumerFactory<String, HubEventProto> protobufConsumerFactory() {
         Map<String, Object> configProps = new HashMap<>();
-        configProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
+        configProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configProps.put(ConsumerConfig.GROUP_ID_CONFIG, "analyzer-group");
         configProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         configProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaProtobufDeserializer.class);
-        configProps.put("schema.registry.url", SCHEMA_REGISTRY_URL);
+        configProps.put("schema.registry.url", schemaRegistryUrl);
         configProps.put("specific.protobuf.value.type", "ru.yandex.practicum.grpc.telemetry.event.HubEventProto");
 
         return new DefaultKafkaConsumerFactory<>(configProps);

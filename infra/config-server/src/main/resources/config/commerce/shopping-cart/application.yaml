@@ -16,7 +16,9 @@ spring:
         format_sql: true  # Форматирование SQL-запросов для удобочитаемости
 
 server:
-  port: 41877
+  port: 0
+#  port: 41877
 
-api:
-  name: warehouse-service # Имя сервиса в Eureka
+warehouse:
+   url:
+#  url: http://localhost:36017   || debug

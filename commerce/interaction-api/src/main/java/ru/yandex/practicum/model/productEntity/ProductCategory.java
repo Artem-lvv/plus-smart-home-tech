@@ -1,11 +1,8 @@
 package ru.yandex.practicum.model.productEntity;
 
 public enum ProductCategory {
-  
   LIGHTING("LIGHTING"),
-  
   CONTROL("CONTROL"),
-  
   SENSORS("SENSORS");
 
   private String value;

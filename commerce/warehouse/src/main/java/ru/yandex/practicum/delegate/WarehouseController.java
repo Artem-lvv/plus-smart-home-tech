@@ -3,9 +3,9 @@ package ru.yandex.practicum.delegate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.service.WarehouseService;
-import ru.yandex.practicum.warehouse_api.api.WarehouseApiDelegate;
+import ru.yandex.practicum.warehouse_api.api.WarehouseApi;
 import ru.yandex.practicum.warehouse_api.model.AddProductToWarehouseRequest;
 import ru.yandex.practicum.warehouse_api.model.AddressDto;
 import ru.yandex.practicum.warehouse_api.model.AssemblyProductForOrderFromShoppingCartRequest;
@@ -16,9 +16,9 @@ import ru.yandex.practicum.warehouse_api.model.ShoppingCartDto;
 import java.util.List;
 import java.util.Map;
 
-@Component
+@RestController
 @RequiredArgsConstructor
-public class ApiApiDelegateImpl implements WarehouseApiDelegate {
+public class WarehouseController implements WarehouseApi {
     private final WarehouseService warehouseService;
 
     @Override
