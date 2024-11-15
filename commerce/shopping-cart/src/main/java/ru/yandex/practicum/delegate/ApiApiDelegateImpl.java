@@ -11,7 +11,6 @@ import ru.yandex.practicum.shopping_cart_api.model.ChangeProductQuantityRequest;
 import ru.yandex.practicum.shopping_cart_api.model.ProductDto;
 import ru.yandex.practicum.shopping_cart_api.model.ShoppingCartDto;
 
-import java.util.List;
 import java.util.Map;
 
 @Component

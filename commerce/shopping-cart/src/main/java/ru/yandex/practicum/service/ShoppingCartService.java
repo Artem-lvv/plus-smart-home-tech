@@ -13,7 +13,7 @@ public interface ShoppingCartService {
     ShoppingCartDto addProductToShoppingCart(String username, Map<String, Long> requestBody);
 
     BookedProductsDto bookingProductsFromShoppingCart(String username);
-//
+
     ProductDto changeProductQuantity(String username, ChangeProductQuantityRequest changeProductQuantityRequest);
 
     void deactivateCurrentShoppingCart(String username);

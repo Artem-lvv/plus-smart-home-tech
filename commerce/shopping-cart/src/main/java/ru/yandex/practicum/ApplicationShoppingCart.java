@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import ru.yandex.practicum.warehouse_api.api.WarehouseApiClient;
 
-@EnableFeignClients(clients = WarehouseApiClient.class)
+@EnableFeignClients(clients = {WarehouseApiClient.class})
 @SpringBootApplication
 public class ApplicationShoppingCart {
     public static void main(String[] args) {
