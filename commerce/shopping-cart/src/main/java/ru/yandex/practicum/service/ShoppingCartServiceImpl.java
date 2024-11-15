@@ -156,7 +156,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 //        val bookedProductsDto = warehouseApiClient.bookingProductForShoppingCart(shoppingCartDto);
 
 
-        return null;
+        return new BookedProductsDto();
     }
 
     @Override

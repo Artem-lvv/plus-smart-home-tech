@@ -1,11 +1,12 @@
 package ru.yandex.practicum.delegate;
 
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.service.ShoppingCartService;
-import ru.yandex.practicum.shopping_cart_api.api.ShoppingCartApiDelegate;
+import ru.yandex.practicum.shopping_cart_api.api.ShoppingCartApi;
 import ru.yandex.practicum.shopping_cart_api.model.BookedProductsDto;
 import ru.yandex.practicum.shopping_cart_api.model.ChangeProductQuantityRequest;
 import ru.yandex.practicum.shopping_cart_api.model.ProductDto;
@@ -13,9 +14,9 @@ import ru.yandex.practicum.shopping_cart_api.model.ShoppingCartDto;
 
 import java.util.Map;
 
-@Component
+@RestController
 @RequiredArgsConstructor
-public class ApiApiDelegateImpl implements ShoppingCartApiDelegate {
+public class ApiApiDelegateImpl implements ShoppingCartApi {
     private final ShoppingCartService shoppingCartService;
 
     @Override
@@ -46,7 +47,8 @@ public class ApiApiDelegateImpl implements ShoppingCartApiDelegate {
 
     @Override
     public ResponseEntity<ShoppingCartDto> getShoppingCart(String username) {
-        return new ResponseEntity<>(shoppingCartService.getShoppingCart(username), HttpStatus.OK);
+        val shoppingCart = shoppingCartService.getShoppingCart(username);
+        return new ResponseEntity<>(shoppingCart, HttpStatus.OK);
     }
 
     @Override
