@@ -22,8 +22,8 @@ public class ProtobufConsumer {
 
     @KafkaListener(topics = "telemetry.hubs.v1", groupId = "analyzer-group",
             containerFactory = "protobufKafkaListenerContainerFactory")
-    public void listenHubs(HubEventProto HubEventProto) {
-        hubService.processDeviceEvent(HubEventProto);
+    public void listenHubs(HubEventProto hubEventProto) {
+        hubService.processDeviceEvent(hubEventProto);
     }
 
 

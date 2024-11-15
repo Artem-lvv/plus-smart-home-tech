@@ -1,0 +1,2 @@
+GET http://localhost:41877/api/v1/shopping-cart?username=testuser
+Content-Type: application/json
