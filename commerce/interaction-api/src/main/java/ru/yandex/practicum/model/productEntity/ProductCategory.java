@@ -1,5 +1,10 @@
 package ru.yandex.practicum.model.productEntity;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
 public enum ProductCategory {
   LIGHTING("LIGHTING"),
   CONTROL("CONTROL"),
@@ -7,15 +12,7 @@ public enum ProductCategory {
 
   private String value;
 
-  ProductCategory(String value) {
-    this.value = value;
-  }
-
-  public String getValue() {
-    return value;
-  }
-
-  @Override
+    @Override
   public String toString() {
     return String.valueOf(value);
   }

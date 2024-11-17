@@ -97,7 +97,7 @@ public class SensorServiceImpl implements SensorService {
 
         SensorEventAvro sensorEventAvro = cs.convert(sensorEventProtoMessage, SensorEventAvro.class);
 
-        log.info("Convert sensorEventProtoMessage to sensorEventAvro. Obj sensorEventProtoMessage - {}. " +
+        log.info("Convert sensorEventProtoMessage to sensorEventAvro. Obj sensorEventProtoMessage - {} \n. " +
                 "Obj SensorEventAvro - {}", sensorEventProtoMessage, sensorEventAvro);
 
         return Optional.ofNullable(sensorEventAvro);

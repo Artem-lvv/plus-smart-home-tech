@@ -1,9 +1,14 @@
 package ru.yandex.practicum.model.productEntity;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 /**
  * Статус, перечисляющий состояние остатка как свойства товара
  */
 
+@Getter
+@AllArgsConstructor
 public enum QuantityState {
   ENDED("ENDED"),
   FEW("FEW"),
@@ -11,10 +16,6 @@ public enum QuantityState {
   MANY("MANY");
 
   private String value;
-
-  QuantityState(String value) {
-    this.value = value;
-  }
 
   public String getValue() {
     return value;

@@ -120,7 +120,6 @@
                         <interfaceOnly>false</interfaceOnly>
                         <useSpringBoot3>true</useSpringBoot3>
                         <delegatePattern>true</delegatePattern>
-                        <!--                        <generatePom>false</generatePom>-->
                     </configOptions>
                 </configuration>
             </plugin>

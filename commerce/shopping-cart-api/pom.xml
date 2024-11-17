@@ -59,10 +59,8 @@
                 <configuration>
                     <inputSpec>${project.basedir}/src/main/resources/shopping-cart-openapi.yaml</inputSpec>
                     <generatorName>spring</generatorName>
-                    <!--                    <library>spring-boot</library>-->
                     <library>spring-cloud</library>
                     <additionalProperties>
-                        <!--                        <additionalProperty>apiNameSuffix=Warehouse</additionalProperty>-->
                     </additionalProperties>
                     <output>${project.build.directory}/generated-sources</output>
                     <apiPackage>ru.yandex.practicum.shopping_cart_api.api</apiPackage>
@@ -72,7 +70,6 @@
                         <interfaceOnly>false</interfaceOnly>
                         <useSpringBoot3>true</useSpringBoot3>
                         <delegatePattern>true</delegatePattern>
-                        <!--                        <generatePom>false</generatePom>-->
                     </configOptions>
                 </configuration>
             </plugin>

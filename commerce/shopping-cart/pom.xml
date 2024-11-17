@@ -88,37 +88,4 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
-
-<!--    <build>-->
-<!--        <plugins>-->
-<!--            <plugin>-->
-<!--                <groupId>org.openapitools</groupId>-->
-<!--                <artifactId>openapi-generator-maven-plugin</artifactId>-->
-<!--                <version>7.8.0</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <goals>-->
-<!--                            <goal>generate</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--                <configuration>-->
-<!--                    <inputSpec>${project.basedir}/src/main/resources/shopping-cart-openapi.yaml</inputSpec>-->
-<!--                    <generatorName>spring</generatorName>-->
-<!--                    &lt;!&ndash;                    <library>spring-boot</library>&ndash;&gt;-->
-<!--                    <library>spring-boot</library>-->
-<!--                    <output>${project.build.directory}/generated-sources</output>-->
-<!--                    <apiPackage>ru.yandex.practicum.api</apiPackage>-->
-<!--                    <modelPackage>ru.yandex.practicum.model</modelPackage>-->
-<!--                    <configOptions>-->
-<!--                        <interfaceOnly>false</interfaceOnly>-->
-<!--                        <useSpringBoot3>true</useSpringBoot3>-->
-<!--                        <delegatePattern>true</delegatePattern>-->
-<!--                        &lt;!&ndash;                        <generatePom>false</generatePom>&ndash;&gt;-->
-<!--                    </configOptions>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
-<!--        </plugins>-->
-<!--    </build>-->
-
 </project>

@@ -90,7 +90,6 @@
                 <configuration>
                     <inputSpec>${project.basedir}/src/main/resources/shopping-store-openapi.yaml</inputSpec>
                     <generatorName>spring</generatorName>
-<!--                    <library>spring-boot</library>-->
                     <library>spring-boot</library>
                     <output>${project.build.directory}/generated-sources</output>
                     <apiPackage>ru.yandex.practicum.api</apiPackage>
@@ -99,7 +98,6 @@
                         <interfaceOnly>false</interfaceOnly>
                         <useSpringBoot3>true</useSpringBoot3>
                         <delegatePattern>true</delegatePattern>
-                        <!--                        <generatePom>false</generatePom>-->
                     </configOptions>
                 </configuration>
             </plugin>

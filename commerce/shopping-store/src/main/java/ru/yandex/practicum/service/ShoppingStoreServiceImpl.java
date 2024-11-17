@@ -39,7 +39,7 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
         ProductDto newProductDto = cs.convert(productEntity, ProductDto.class);
 
         log.info("Created new product: {}", productEntity);
-        log.info("Convert ProductEntity to ProductDto: {}. {}", productEntity, newProductDto);
+        log.info("Convert ProductEntity to ProductDto: {}. \n {}", productEntity, newProductDto);
 
         return newProductDto;
     }
@@ -52,8 +52,8 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
         }
         ProductDto productDto = cs.convert(productById.get(), ProductDto.class);
 
-        log.info("Get product by id: {}. Product: {}", productId, productById);
-        log.info("Convert ProductEntity to ProductDto: {}. {}", productById, productDto);
+        log.info("Get product by id: {}. \n Product: {}", productId, productById);
+        log.info("Convert ProductEntity to ProductDto: {}. \n {}", productById, productDto);
 
         return productDto;
     }

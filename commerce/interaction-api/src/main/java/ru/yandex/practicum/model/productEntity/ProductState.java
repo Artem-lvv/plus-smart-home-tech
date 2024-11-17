@@ -1,20 +1,17 @@
 package ru.yandex.practicum.model.productEntity;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
 public enum ProductState {
   ACTIVE("ACTIVE"),
   DEACTIVATE("DEACTIVATE");
 
   private String value;
 
-  ProductState(String value) {
-    this.value = value;
-  }
-
-  public String getValue() {
-    return value;
-  }
-
-  @Override
+    @Override
   public String toString() {
     return String.valueOf(value);
   }
