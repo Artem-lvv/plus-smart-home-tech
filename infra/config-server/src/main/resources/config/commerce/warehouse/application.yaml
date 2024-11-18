@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/smartHomeDB
+    username: myuser
+    password: mypassword
+    driver-class-name: org.postgresql.Driver
+  sql:
+    init:
+      mode: always
+  jpa:
+    hibernate:
+      ddl-auto: update  # Автоматическое создание или обновление таблиц
+    show-sql: true  # Показывать SQL-запросы в логах
+    properties:
+      hibernate:
+        format_sql: true  # Форматирование SQL-запросов для удобочитаемости
+
+server:
+  port: 0
+#  port: 36017
+
+address-warehouse:
+  country: test
+  city: test
+  street: test
+  house: test
+  flat: test
+
+warehouse:
+  url:

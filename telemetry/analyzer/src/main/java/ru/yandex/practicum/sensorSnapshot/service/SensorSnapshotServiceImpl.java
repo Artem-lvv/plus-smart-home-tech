@@ -32,9 +32,9 @@ public class SensorSnapshotServiceImpl implements SensorSnapshotService {
     private final ScenarioRepository scenarioRepository;
     private final ScenarioConditionRepository scenarioConditionRepository;
     private final ScenarioActionRepository scenarioActionRepository;
-    final String EQUALS = "EQUALS";
-    final String GREATER_THAN = "GREATER_THAN";
-    final String LESS_THAN = "LESS_THAN";
+    final String equals = "EQUALS";
+    final String greaterThan = "GREATER_THAN";
+    final String lessThan = "LESS_THAN";
 
     @Value("${analyzer.snapshot-properties.temperatureCelsius}")
     private boolean temperatureCelsius;
@@ -159,17 +159,17 @@ public class SensorSnapshotServiceImpl implements SensorSnapshotService {
 
     private boolean checkConditionSensors(int sensorValue, String operation, int conditionValue) {
         switch (operation) {
-            case EQUALS:
+            case equals:
                 if (sensorValue == conditionValue) {
                     return true;
                 }
                 break;
-            case GREATER_THAN:
+            case greaterThan:
                 if (sensorValue > conditionValue) {
                     return true;
                 }
                 break;
-            case LESS_THAN:
+            case lessThan:
                 if (sensorValue < conditionValue) {
                     return true;
                 }

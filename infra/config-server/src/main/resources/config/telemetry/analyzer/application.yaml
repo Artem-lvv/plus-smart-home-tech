@@ -1,0 +1,43 @@
+grpc:
+  client:
+    hub-router:
+      address: 'static://localhost:59090'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/smartHomeDB
+    username: myuser
+    password: mypassword
+    driver-class-name: org.postgresql.Driver
+  sql:
+    init:
+      mode: always
+  jpa:
+    hibernate:
+      ddl-auto: update  # Автоматическое создание или обновление таблиц
+    show-sql: true  # Показывать SQL-запросы в логах
+    properties:
+      hibernate:
+        format_sql: true  # Форматирование SQL-запросов для удобочитаемости
+
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9092
+      properties:
+        schema.registry.url: http://localhost:8081
+      auto-offset-reset: latest
+
+analyzer:
+  topic:
+    telemetry:
+      sensors:
+        v1: telemetry.sensors.v1
+      snapshots:
+        v1: telemetry.snapshots.v1
+      hubs:
+        v1: telemetry.hubs.v1
+  snapshot-properties:
+    temperatureCelsius: true

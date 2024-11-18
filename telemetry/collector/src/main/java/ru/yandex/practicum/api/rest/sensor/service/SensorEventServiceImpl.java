@@ -2,7 +2,6 @@ package ru.yandex.practicum.api.rest.sensor.service;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.avro.specific.SpecificRecord;
-import org.apache.avro.specific.SpecificRecordBase;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
