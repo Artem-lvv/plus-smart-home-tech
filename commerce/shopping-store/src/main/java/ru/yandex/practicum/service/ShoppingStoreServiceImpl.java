@@ -12,9 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.exception.EntityNotFoundException;
 import ru.yandex.practicum.model.Pageable;
 import ru.yandex.practicum.model.ProductDto;
-import ru.yandex.practicum.model.ProductEntity;
-import ru.yandex.practicum.model.QuantityState;
 import ru.yandex.practicum.model.SetProductQuantityStateRequest;
+import ru.yandex.practicum.model.productEntity.Product;
+import ru.yandex.practicum.model.productEntity.ProductCategory;
+import ru.yandex.practicum.model.productEntity.QuantityState;
 import ru.yandex.practicum.repository.ProductRepository;
 
 import java.util.List;
@@ -34,7 +35,7 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
     @Override
     @Transactional
     public ProductDto createNewProduct(ProductDto productDto) {
-        ProductEntity productEntity = cs.convert(productDto, ProductEntity.class);
+        Product productEntity = cs.convert(productDto, Product.class);
         productEntity = productRepository.save(productEntity);
         ProductDto newProductDto = cs.convert(productEntity, ProductDto.class);
 
@@ -46,14 +47,14 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
 
     @Override
     public ProductDto getProduct(UUID productId) {
-        Optional<ProductEntity> productById = productRepository.findById(productId);
+        Optional<Product> productById = productRepository.findById(productId);
         if (productById.isEmpty()) {
             throw new EntityNotFoundException("Product", productId.toString());
         }
         ProductDto productDto = cs.convert(productById.get(), ProductDto.class);
 
         log.info("Get product by id: {}. \n Product: {}", productId, productById);
-        log.info("Convert ProductEntity to ProductDto: {}. \n {}", productById, productDto);
+        log.info("Convert Product to ProductDto: {}. \n {}", productById, productDto);
 
         return productDto;
     }
@@ -66,7 +67,7 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
                 Sort.Direction.DESC,
                 pageable.getSort().toArray(new String[0]));
 
-        Page<ProductEntity> productEntities = productRepository.findByProductCategory(category, pageRequest);
+        Page<Product> productEntities = productRepository.findByProductCategory(category, pageRequest);
 
         List<ProductDto> productDtos = productEntities.stream()
                 .map(productEntity -> cs.convert(productEntity, ProductDto.class))
@@ -80,7 +81,7 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
     @Override
     @Transactional
     public Boolean removeProductFromStore(UUID productId) {
-        Optional<ProductEntity> productEntityOptional = productRepository.findById(productId);
+        Optional<Product> productEntityOptional = productRepository.findById(productId);
         if (productEntityOptional.isPresent()) {
             productRepository.deleteById(productId);
             log.info("Removed product with id: {}", productId);
@@ -94,10 +95,11 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
     @Override
     @Transactional
     public Boolean setProductQuantityState(SetProductQuantityStateRequest request) {
-        Optional<ProductEntity> productEntityOptional = productRepository.findById(request.getProductId());
+        Optional<Product> productEntityOptional = productRepository.findById(request.getProductId());
         if (productEntityOptional.isPresent()) {
-            ProductEntity productEntity = productEntityOptional.get();
-            productEntity.setQuantityState(QuantityState.fromValue(request.getQuantityState().getValue()));
+            Product productEntity = productEntityOptional.get();
+            productEntity.setQuantityState(ru.yandex.practicum.model.productEntity.QuantityState
+                    .fromValue(request.getQuantityState().getValue()));
             productRepository.save(productEntity);
 
             log.info("Updated quantity for product id: {} to {}", request.getProductId(), request.getQuantityState());
@@ -111,16 +113,16 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
     @Override
     @Transactional
     public ProductDto updateProduct(ProductDto productDto) {
-        Optional<ProductEntity> productEntityOptional = productRepository.findById(productDto.getProductId().get());
+        Optional<Product> productEntityOptional = productRepository.findById(productDto.getProductId().get());
         if (productEntityOptional.isPresent()) {
-            ProductEntity productEntity = productEntityOptional.get();
+            Product productEntity = productEntityOptional.get();
             productEntity.setProductName(productDto.getProductName());
             productEntity.setDescription(productDto.getDescription());
             productEntity.setPrice(productDto.getPrice());
-            productEntity.setQuantityState(productDto.getQuantityState());
-            productEntity.setProductCategory(productDto.getProductCategory());
+            productEntity.setQuantityState(QuantityState.fromValue(productDto.getQuantityState().getValue()));
+            productEntity.setProductCategory(ProductCategory.fromValue(productDto.getProductCategory().getValue()));
 
-            ProductEntity updatedEntity = productRepository.save(productEntity);
+            Product updatedEntity = productRepository.save(productEntity);
             ProductDto updatedProductDto = cs.convert(updatedEntity, ProductDto.class);
 
             log.info("Updated product: {}", updatedProductDto);

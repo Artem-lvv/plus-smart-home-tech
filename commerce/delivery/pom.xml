@@ -9,7 +9,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>shopping-store</artifactId>
+    <artifactId>delivery</artifactId>
 
     <dependencies>
         <dependency>
@@ -19,7 +19,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-<!--            <scope>test</scope>-->
+            <!--            <scope>test</scope>-->
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
@@ -74,39 +74,10 @@
         </dependency>
         <dependency>
             <groupId>ru.yandex.practicum</groupId>
-            <artifactId>interaction-api</artifactId>
+            <artifactId>delivery-api</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.openapitools</groupId>
-                <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>7.8.0</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <inputSpec>${project.basedir}/src/main/resources/shopping-store-openapi.yaml</inputSpec>
-                    <generatorName>spring</generatorName>
-                    <library>spring-boot</library>
-                    <output>${project.build.directory}/generated-sources</output>
-                    <apiPackage>ru.yandex.practicum.api</apiPackage>
-                    <modelPackage>ru.yandex.practicum.model</modelPackage>
-                    <configOptions>
-                        <interfaceOnly>false</interfaceOnly>
-                        <useSpringBoot3>true</useSpringBoot3>
-                        <delegatePattern>true</delegatePattern>
-                    </configOptions>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

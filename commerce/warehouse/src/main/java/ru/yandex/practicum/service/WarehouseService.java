@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface WarehouseService {
-    void newProductInWarehouse(NewProductInWarehouseRequest newProductInWarehouseRequest);
 
+    void newProductInWarehouse(NewProductInWarehouseRequest newProductInWarehouseRequest);
 
     AddressDto getWarehouseAddress();
 

@@ -9,17 +9,12 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>shopping-store</artifactId>
+    <artifactId>payment-api</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-<!--            <scope>test</scope>-->
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
@@ -36,47 +31,16 @@
             <artifactId>jackson-databind-nullable</artifactId>
             <version>0.2.6</version>
         </dependency>
-
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>42.7.3</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-config</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.retry</groupId>
-            <artifactId>spring-retry</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <!--            <scope>test</scope>-->
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
-        <dependency>
-            <groupId>ru.yandex.practicum</groupId>
-            <artifactId>interaction-api</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
+
     </dependencies>
 
     <build>
@@ -93,13 +57,16 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <inputSpec>${project.basedir}/src/main/resources/shopping-store-openapi.yaml</inputSpec>
+                    <inputSpec>${project.basedir}/src/main/resources/payment-openapi.yaml</inputSpec>
                     <generatorName>spring</generatorName>
-                    <library>spring-boot</library>
+                    <library>spring-cloud</library>
+                    <additionalProperties>
+                    </additionalProperties>
                     <output>${project.build.directory}/generated-sources</output>
-                    <apiPackage>ru.yandex.practicum.api</apiPackage>
-                    <modelPackage>ru.yandex.practicum.model</modelPackage>
+                    <apiPackage>ru.yandex.practicum.payment_api.api</apiPackage>
+                    <modelPackage>ru.yandex.practicum.payment_api.model</modelPackage>
                     <configOptions>
+                        <useTags>true</useTags>
                         <interfaceOnly>false</interfaceOnly>
                         <useSpringBoot3>true</useSpringBoot3>
                         <delegatePattern>true</delegatePattern>

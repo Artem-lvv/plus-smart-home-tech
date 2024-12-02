@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.proxy.HibernateProxy;
@@ -19,6 +20,7 @@ import java.util.UUID;
 
 @Entity
 @Data
+@Builder
 @AllArgsConstructor
 @Table(name = "products")
 @NoArgsConstructor
