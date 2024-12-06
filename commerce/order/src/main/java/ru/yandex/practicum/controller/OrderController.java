@@ -45,7 +45,7 @@ public class OrderController implements OrderApi {
 
     @Override
     public ResponseEntity<OrderDto> createNewOrder(CreateNewOrderRequest createNewOrderRequest) {
-        return new ResponseEntity<>(orderService.createNewOrder(createNewOrderRequest), HttpStatus.CREATED);
+        return new ResponseEntity<>(orderService.createNewOrder(createNewOrderRequest), HttpStatus.OK);
     }
 
     @Override
@@ -65,12 +65,12 @@ public class OrderController implements OrderApi {
 
     @Override
     public ResponseEntity<OrderDto> payment(UUID body, UUID orderId) {
-        return null;
+        return new ResponseEntity<>(orderService.payment(body, orderId), HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<OrderDto> paymentFailed(UUID body, UUID orderId) {
-        return null;
+        return orderService.paymentFailed(body, orderId);
     }
 
     @Override

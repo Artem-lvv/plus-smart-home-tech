@@ -10,13 +10,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.exception.EntityNotFoundException;
-import ru.yandex.practicum.model.Pageable;
-import ru.yandex.practicum.model.ProductDto;
-import ru.yandex.practicum.model.SetProductQuantityStateRequest;
 import ru.yandex.practicum.model.productEntity.Product;
 import ru.yandex.practicum.model.productEntity.ProductCategory;
 import ru.yandex.practicum.model.productEntity.QuantityState;
 import ru.yandex.practicum.repository.ProductRepository;
+import ru.yandex.practicum.shopping_store_api.model.Pageable;
+import ru.yandex.practicum.shopping_store_api.model.ProductDto;
+import ru.yandex.practicum.shopping_store_api.model.SetProductQuantityStateRequest;
 
 import java.util.List;
 import java.util.Optional;

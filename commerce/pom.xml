@@ -25,6 +25,7 @@
         <module>payment</module>
         <module>delivery-api</module>
         <module>delivery</module>
+        <module>shopping-store-api</module>
     </modules>
 
 </project>

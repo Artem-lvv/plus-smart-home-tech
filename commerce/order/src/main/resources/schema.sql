@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS orders
 (
-    id               UUID PRIMARY KEY,
+    order_id               UUID PRIMARY KEY,
     shopping_cart_id UUID,
     payment_id       UUID NOT NULL,
     delivery_id      UUID NOT NULL,
@@ -15,6 +15,13 @@ CREATE TABLE IF NOT EXISTS orders
     total_price      NUMERIC(10, 2),
     delivery_price   NUMERIC(10, 2),
     product_price    NUMERIC(10, 2)
+);
+
+CREATE TABLE IF NOT EXISTS order_products
+(
+    order_products_id UUID PRIMARY KEY,
+    order_id          UUID,
+    quantity          INT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS address

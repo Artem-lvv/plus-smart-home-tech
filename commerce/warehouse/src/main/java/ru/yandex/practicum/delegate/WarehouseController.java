@@ -11,9 +11,9 @@ import ru.yandex.practicum.warehouse_api.model.AddressDto;
 import ru.yandex.practicum.warehouse_api.model.AssemblyProductForOrderFromShoppingCartRequest;
 import ru.yandex.practicum.warehouse_api.model.BookedProductsDto;
 import ru.yandex.practicum.warehouse_api.model.NewProductInWarehouseRequest;
+import ru.yandex.practicum.warehouse_api.model.ShippedToDeliveryRequest;
 import ru.yandex.practicum.warehouse_api.model.ShoppingCartDto;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -22,14 +22,13 @@ public class WarehouseController implements WarehouseApi {
     private final WarehouseService warehouseService;
 
     @Override
-    public ResponseEntity<Void> acceptReturn(Map<String, Long> requestBody, List<Object> products) {
-        warehouseService.acceptReturn(requestBody, products);
+    public ResponseEntity<Void> acceptReturn(Map<String, Long> requestBody) {
+        warehouseService.acceptReturn(requestBody);
         return ResponseEntity.ok().build();
     }
 
     @Override
     public ResponseEntity<Void> addProductToWarehouse(AddProductToWarehouseRequest addProductToWarehouseRequest) {
-
         warehouseService.addProductToWarehouse(addProductToWarehouseRequest);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -50,14 +49,24 @@ public class WarehouseController implements WarehouseApi {
     }
 
     @Override
+    public ResponseEntity<BookedProductsDto> checkProductQuantityEnoughForShoppingCart(ShoppingCartDto shoppingCartDto) {
+        BookedProductsDto bookedProducts = warehouseService.checkProductQuantityEnoughForShoppingCart(shoppingCartDto);
+        return new ResponseEntity<>(bookedProducts, HttpStatus.OK);
+    }
+
+    @Override
     public ResponseEntity<AddressDto> getWarehouseAddress() {
         return new ResponseEntity<>(warehouseService.getWarehouseAddress(), HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<Void> newProductInWarehouse(NewProductInWarehouseRequest newProductInWarehouseRequest) {
-
         warehouseService.newProductInWarehouse(newProductInWarehouseRequest);
         return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> shippedToDelivery(ShippedToDeliveryRequest shippedToDeliveryRequest) {
+        return null;
     }
 }

@@ -23,5 +23,7 @@ public interface WarehouseService {
     BookedProductsDto assemblyProductForOrderFromShoppingCart(
             AssemblyProductForOrderFromShoppingCartRequest assemblyProductForOrderFromShoppingCartRequest);
 
-    void acceptReturn(Map<String, Long> requestBody, List<Object> products);
+    void acceptReturn(Map<String, Long> requestBody);
+
+    BookedProductsDto checkProductQuantityEnoughForShoppingCart(ShoppingCartDto shoppingCartDto);
 }

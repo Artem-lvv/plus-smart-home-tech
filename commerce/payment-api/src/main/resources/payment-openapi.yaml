@@ -15,14 +15,14 @@ paths:
         - payment
       description: Формирование оплаты для заказа (переход в платежный шлюз).
       operationId: payment
-      parameters:
-        - name: order
-          in: query
-          description: Заказ для формирования оплаты.
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrderDto'
+#      parameters:
+#        - name: order
+#          in: query
+#          description: Заказ для формирования оплаты.
+#          content:
+#            '*/*':
+#              schema:
+#                $ref: '#/components/schemas/OrderDto'
       requestBody:
         content:
           application/json:
@@ -48,14 +48,14 @@ paths:
         - payment
       description: Расчёт полной стоимости заказа.
       operationId: getTotalCost
-      parameters:
-        - name: order
-          in: query
-          description: Заказ для расчёта.
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrderDto'
+#      parameters:
+#        - name: order
+#          in: query
+#          description: Заказ для расчёта.
+#          content:
+#            '*/*':
+#              schema:
+#                $ref: '#/components/schemas/OrderDto'
       requestBody:
         content:
           application/json:
@@ -81,15 +81,15 @@ paths:
         - payment
       description: Метод для эмуляции успешной оплаты в платежного шлюза.
       operationId: paymentSuccess
-      parameters:
-        - name: order
-          in: query
-          description: Идентификатор заказа.
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: uuid
+#      parameters:
+#        - name: order
+#          in: query
+#          description: Идентификатор заказа.
+#          content:
+#            '*/*':
+#              schema:
+#                type: string
+#                format: uuid
       requestBody:
         content:
           application/json:
@@ -111,14 +111,14 @@ paths:
         - payment
       description: Расчёт стоимости товаров в заказе.
       operationId: productCost
-      parameters:
-        - name: order
-          in: query
-          description: Заказ для расчёта.
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrderDto'
+#      parameters:
+#        - name: order
+#          in: query
+#          description: Заказ для расчёта.
+#          content:
+#            '*/*':
+#              schema:
+#                $ref: '#/components/schemas/OrderDto'
       requestBody:
         content:
           application/json:
@@ -144,15 +144,15 @@ paths:
         - payment
       description: Метод для эмуляции отказа в оплате платежного шлюза.
       operationId: paymentFailed
-      parameters:
-        - name: order
-          in: query
-          description: Идентификатор заказа.
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: uuid
+#      parameters:
+#        - name: order
+#          in: query
+#          description: Идентификатор заказа.
+#          content:
+#            '*/*':
+#              schema:
+#                type: string
+#                format: uuid
       requestBody:
         content:
           application/json:
