@@ -19,6 +19,13 @@
         <module>warehouse</module>
         <module>warehouse-api</module>
         <module>shopping-cart-api</module>
+        <module>order-api</module>
+        <module>order</module>
+        <module>payment-api</module>
+        <module>payment</module>
+        <module>delivery-api</module>
+        <module>delivery</module>
+        <module>shopping-store-api</module>
     </modules>
 
 </project>
