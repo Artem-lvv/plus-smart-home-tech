@@ -25,7 +25,6 @@ import java.util.UUID;
 @Setter
 @ToString
 @RequiredArgsConstructor
-@NoArgsConstructor
 @AllArgsConstructor
 public class OrderProduct {
     @Id

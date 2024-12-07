@@ -2,11 +2,11 @@ package ru.yandex.practicum.converter;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.model.ProductDto;
 import ru.yandex.practicum.model.productEntity.Product;
 import ru.yandex.practicum.model.productEntity.ProductCategory;
 import ru.yandex.practicum.model.productEntity.ProductState;
 import ru.yandex.practicum.model.productEntity.QuantityState;
+import ru.yandex.practicum.shopping_store_api.model.ProductDto;
 
 import java.util.Objects;
 
