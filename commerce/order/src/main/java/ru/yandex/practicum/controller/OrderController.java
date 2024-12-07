@@ -25,22 +25,22 @@ public class OrderController implements OrderApi {
 
     @Override
     public ResponseEntity<OrderDto> assemblyFailed(UUID body, UUID orderId) {
-        return null;
+        return new ResponseEntity<>(orderService.assemblyFailed(body, orderId), HttpStatus.BAD_REQUEST);
     }
 
     @Override
     public ResponseEntity<OrderDto> calculateDeliveryCost(UUID body, UUID orderId) {
-        return null;
+        return new ResponseEntity<>(orderService.calculateDeliveryCost(body, orderId), HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<OrderDto> calculateTotalCost(UUID body, UUID orderId) {
-        return null;
+        return new ResponseEntity<>(orderService.calculateTotalCost(body, orderId), HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<OrderDto> complete(UUID body, UUID orderId) {
-        return null;
+        return new ResponseEntity<>(orderService.complete(body, orderId), HttpStatus.OK);
     }
 
     @Override
@@ -50,17 +50,17 @@ public class OrderController implements OrderApi {
 
     @Override
     public ResponseEntity<OrderDto> delivery(UUID body, UUID orderId) {
-        return null;
+        return new ResponseEntity<>(orderService.delivery(body, orderId), HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<OrderDto> deliveryFailed(UUID body, UUID orderId) {
-        return null;
+        return new ResponseEntity<>(orderService.deliveryFailed(body, orderId), HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<List<OrderDto>> getClientOrders(String username) {
-        return null;
+        return new ResponseEntity<>(orderService.getClientOrders(username), HttpStatus.OK);
     }
 
     @Override
@@ -70,11 +70,16 @@ public class OrderController implements OrderApi {
 
     @Override
     public ResponseEntity<OrderDto> paymentFailed(UUID body, UUID orderId) {
-        return orderService.paymentFailed(body, orderId);
+        return new ResponseEntity<>(orderService.paymentFailed(body, orderId), HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<OrderDto> paymentSuccess(UUID body, UUID orderId) {
+        return new ResponseEntity<>(orderService.paymentSuccess(body), HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<OrderDto> productReturn(ProductReturnRequest productReturnRequest) {
-        return null;
+        return new ResponseEntity<>(orderService.productReturn(productReturnRequest), HttpStatus.OK);
     }
 }

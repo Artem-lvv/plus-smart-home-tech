@@ -1,4 +1,4 @@
-package ru.yandex.practicum.model;
+package ru.yandex.practicum.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,23 +12,20 @@ import lombok.ToString;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
-@Table(name = "address")
+@Table(name = "orders_deliveries")
 @Getter
 @Setter
 @ToString
 @RequiredArgsConstructor
-public class Address {
+public class OrderDelivery {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long addressId;
-
-    private String country;
-    private String city;
-    private String street;
-    private String house;
-    private String flat;
+    private UUID orderDeliveryId;
+    private UUID orderId;
+    private UUID deliveryId;
 
     @Override
     public final boolean equals(Object o) {
@@ -37,8 +34,8 @@ public class Address {
         Class<?> oEffectiveClass = o instanceof HibernateProxy proxy ? proxy.getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy proxy ? proxy.getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        Address address = (Address) o;
-        return getAddressId() != null && Objects.equals(getAddressId(), address.getAddressId());
+        OrderDelivery that = (OrderDelivery) o;
+        return getOrderDeliveryId() != null && Objects.equals(getOrderDeliveryId(), that.getOrderDeliveryId());
     }
 
     @Override

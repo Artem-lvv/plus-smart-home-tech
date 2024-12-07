@@ -1,8 +1,9 @@
 CREATE TABLE IF NOT EXISTS orders
 (
-    order_id               UUID PRIMARY KEY,
+    order_id         UUID PRIMARY KEY,
     shopping_cart_id UUID,
     payment_id       UUID NOT NULL,
+    username         VARCHAR(255),
     delivery_id      UUID NOT NULL,
     state            VARCHAR(20) CHECK (state IN (
           'NEW', 'ON_PAYMENT', 'ON_DELIVERY', 'DONE', 'DELIVERED', 'ASSEMBLED',
@@ -26,7 +27,7 @@ CREATE TABLE IF NOT EXISTS order_products
 
 CREATE TABLE IF NOT EXISTS address
 (
-    id      SERIAL PRIMARY KEY,
+    address_id      SERIAL PRIMARY KEY,
     country VARCHAR(255) NOT NULL,
     city    VARCHAR(255) NOT NULL,
     street  VARCHAR(255) NOT NULL,

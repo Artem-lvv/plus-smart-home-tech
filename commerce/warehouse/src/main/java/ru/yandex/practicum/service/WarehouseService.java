@@ -5,6 +5,7 @@ import ru.yandex.practicum.warehouse_api.model.AddressDto;
 import ru.yandex.practicum.warehouse_api.model.AssemblyProductForOrderFromShoppingCartRequest;
 import ru.yandex.practicum.warehouse_api.model.BookedProductsDto;
 import ru.yandex.practicum.warehouse_api.model.NewProductInWarehouseRequest;
+import ru.yandex.practicum.warehouse_api.model.ShippedToDeliveryRequest;
 import ru.yandex.practicum.warehouse_api.model.ShoppingCartDto;
 
 import java.util.List;
@@ -26,4 +27,6 @@ public interface WarehouseService {
     void acceptReturn(Map<String, Long> requestBody);
 
     BookedProductsDto checkProductQuantityEnoughForShoppingCart(ShoppingCartDto shoppingCartDto);
+
+    Void shippedToDelivery(ShippedToDeliveryRequest shippedToDeliveryRequest);
 }

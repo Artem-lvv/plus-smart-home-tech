@@ -6,7 +6,7 @@ servers:
   - url: http://192.168.1.96:60239
     description: Generated server url
 tags:
-  - name: Шлюз доставки
+  - name: delivery
     description: API для расчёта, проведения доставки
 paths:
   /api/v1/delivery:
@@ -15,14 +15,14 @@ paths:
         - delivery
       description: Создать новую доставку в БД.
       operationId: planDelivery
-      parameters:
-        - name: deliveryDto
-          in: query
-          description: Доставка для сохранения.
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/DeliveryDto'
+#      parameters:
+#        - name: deliveryDto
+#          in: query
+#          description: Доставка для сохранения.
+#          content:
+#            '*/*':
+#              schema:
+#                $ref: '#/components/schemas/DeliveryDto'
       requestBody:
         content:
           application/json:
@@ -42,15 +42,15 @@ paths:
         - delivery
       description: Эмуляция успешной доставки товара.
       operationId: deliverySuccessful
-      parameters:
-        - name: order
-          in: query
-          description: Идентификатор заказа.
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: uuid
+#      parameters:
+#        - name: order
+#          in: query
+#          description: Идентификатор заказа.
+#          content:
+#            '*/*':
+#              schema:
+#                type: string
+#                format: uuid
       requestBody:
         content:
           application/json:
@@ -72,15 +72,15 @@ paths:
         - delivery
       description: Эмуляция получения товара в доставку.
       operationId: deliveryPicked
-      parameters:
-        - name: order
-          in: query
-          description: Идентификатор заказа.
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: uuid
+#      parameters:
+#        - name: order
+#          in: query
+#          description: Идентификатор заказа.
+#          content:
+#            '*/*':
+#              schema:
+#                type: string
+#                format: uuid
       requestBody:
         content:
           application/json:
@@ -102,15 +102,15 @@ paths:
         - delivery
       description: Эмуляция неудачного вручения товара.
       operationId: deliveryFailed
-      parameters:
-        - name: order
-          in: query
-          description: Идентификатор заказа.
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: uuid
+#      parameters:
+#        - name: order
+#          in: query
+#          description: Идентификатор заказа.
+#          content:
+#            '*/*':
+#              schema:
+#                type: string
+#                format: uuid
       requestBody:
         content:
           application/json:
@@ -132,14 +132,14 @@ paths:
         - delivery
       description: Расчёт полной стоимости доставки заказа.
       operationId: deliveryCost
-      parameters:
-        - name: orderDto
-          in: query
-          description: Заказ для расчёта.
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrderDto'
+#      parameters:
+#        - name: orderDto
+#          in: query
+#          description: Заказ для расчёта.
+#          content:
+#            '*/*':
+#              schema:
+#                $ref: '#/components/schemas/OrderDto'
       requestBody:
         content:
           application/json:

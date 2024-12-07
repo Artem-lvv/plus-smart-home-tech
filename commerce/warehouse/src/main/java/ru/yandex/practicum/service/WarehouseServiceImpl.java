@@ -8,12 +8,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.condig.AddressWarehouse;
 import ru.yandex.practicum.entity.Dimension;
+import ru.yandex.practicum.entity.OrderDelivery;
 import ru.yandex.practicum.entity.ProductInWarehouse;
 import ru.yandex.practicum.entity.ReservedProduct;
 import ru.yandex.practicum.entity.model.ProductIdToAvailableStock;
 import ru.yandex.practicum.exception.DuplicateEntityException;
 import ru.yandex.practicum.exception.EntityNotFoundException;
 import ru.yandex.practicum.exception.NotEnoughProductInStockException;
+import ru.yandex.practicum.repository.OrderDeliveryRepository;
 import ru.yandex.practicum.repository.ProductInWarehouseRepository;
 import ru.yandex.practicum.repository.ProductRepository;
 import ru.yandex.practicum.repository.ReservedProductRepository;
@@ -22,6 +24,7 @@ import ru.yandex.practicum.warehouse_api.model.AddressDto;
 import ru.yandex.practicum.warehouse_api.model.AssemblyProductForOrderFromShoppingCartRequest;
 import ru.yandex.practicum.warehouse_api.model.BookedProductsDto;
 import ru.yandex.practicum.warehouse_api.model.NewProductInWarehouseRequest;
+import ru.yandex.practicum.warehouse_api.model.ShippedToDeliveryRequest;
 import ru.yandex.practicum.warehouse_api.model.ShoppingCartDto;
 
 import java.util.ArrayList;
@@ -38,6 +41,8 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class WarehouseServiceImpl implements WarehouseService {
+
+    private final OrderDeliveryRepository orderDeliveryRepository;
 
     private final ReservedProductRepository reservedProductRepository;
     private final ProductInWarehouseRepository productInWarehouseRepository;
@@ -209,6 +214,18 @@ public class WarehouseServiceImpl implements WarehouseService {
                 reservationProducts);
 
         return createBookingProductsDto(toReservation, reservationProducts);
+    }
+
+    @Override
+    public Void shippedToDelivery(ShippedToDeliveryRequest shippedToDeliveryRequest) {
+        OrderDelivery orderDelivery = new OrderDelivery();
+        orderDelivery.setDeliveryId(shippedToDeliveryRequest.getDeliveryId());
+        orderDelivery.setOrderId(shippedToDeliveryRequest.getOrderId());
+
+        orderDeliveryRepository.save(orderDelivery);
+        log.info("Create OrderDelivery {}", orderDelivery);
+
+        return null;
     }
 
     private BookedProductsDto createBookingProductsDto(List<ReservedProduct> toReservation,

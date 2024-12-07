@@ -67,6 +67,6 @@ public class WarehouseController implements WarehouseApi {
 
     @Override
     public ResponseEntity<Void> shippedToDelivery(ShippedToDeliveryRequest shippedToDeliveryRequest) {
-        return null;
+        return new ResponseEntity<>(warehouseService.shippedToDelivery(shippedToDeliveryRequest), HttpStatus.OK);
     }
 }

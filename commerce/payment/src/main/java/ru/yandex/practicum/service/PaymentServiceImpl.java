@@ -2,7 +2,6 @@ package ru.yandex.practicum.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.exception.EntityNotFoundException;
@@ -19,12 +18,11 @@ import ru.yandex.practicum.shopping_store_api.model.ProductDto;
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
 @Service
-@Transactional(readOnly = true)
+@Transactional(readOnly = false)
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
@@ -33,7 +31,10 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public BigDecimal getTotalCost(OrderDto orderDto) {
-        return null;
+        double sumProduct = getSumProduct(orderDto);
+        double feeProduct = sumProduct * 10 / (10 + 100); // налог
+
+        return BigDecimal.valueOf(sumProduct + feeProduct + orderDto.getDeliveryPrice().doubleValue());
     }
 
     @Override
@@ -44,6 +45,8 @@ public class PaymentServiceImpl implements PaymentService {
 
         Payment payment = Payment.builder()
                 .shoppingCartId(orderDto.getShoppingCartId().get())
+                .totalPayment(orderDto.getTotalPrice())
+                .deliveryTotal(orderDto.getDeliveryPrice())
                 .paymentStatus(PaymentStatus.PENDING)
                 .build();
 
@@ -58,29 +61,46 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public Void paymentFailed(UUID body) {
-        Optional<Payment> paymentByOrderId = paymentRepository.findByOrderId(body);
+        Payment paymentByOrderId = paymentRepository.findByOrderId(body)
+                .orElseThrow(() -> new EntityNotFoundException("Payment", body.toString()));
 
-        if (Objects.isNull(body) || paymentByOrderId.isEmpty()) {
-            throw new EntityNotFoundException("Order", body.toString());
-        }
+        orderApiClient.paymentFailed(body, body);
 
-        paymentByOrderId.get().setPaymentStatus(PaymentStatus.FAILED);
-        log.info("Payment failed: {}", paymentByOrderId);
+        paymentByOrderId.setPaymentStatus(PaymentStatus.FAILED);
+
+        paymentRepository.save(paymentByOrderId);
+        log.info("Payment FAILED: {}", paymentByOrderId);
 
         return null;
     }
 
     @Override
     public Void paymentSuccess(UUID body) {
+        Payment paymentByOrderId = paymentRepository.findByOrderId(body)
+                .orElseThrow(() -> new EntityNotFoundException("Payment", body.toString()));
+
+        orderApiClient.paymentSuccess(body, body);
+
+        paymentByOrderId.setPaymentStatus(PaymentStatus.SUCCESS);
+
+        paymentRepository.save(paymentByOrderId);
+        log.info("Payment SUCCESS: {}", paymentByOrderId);
+
         return null;
     }
 
     @Override
     public BigDecimal productCost(OrderDto orderDto) {
-        Payment payment = paymentRepository.findById(orderDto.getPaymentId())
+        paymentRepository.findById(orderDto.getPaymentId())
                 .orElseThrow(() -> new EntityNotFoundException("Payment", orderDto.getPaymentId().toString()));
 
-        Double sum = 0.0;
+        double sum = getSumProduct(orderDto);
+
+        return BigDecimal.valueOf(sum);
+    }
+
+    private double getSumProduct(OrderDto orderDto) {
+        double sum = 0.0;
 
         for (Map.Entry<String, Long> stringLongEntry : orderDto.getProducts().entrySet()) {
             ProductDto product = shoppingStoreApiClient.getProduct(UUID
@@ -88,10 +108,6 @@ public class PaymentServiceImpl implements PaymentService {
 
             sum += product.getPrice().doubleValue() * stringLongEntry.getValue();
         }
-
-
-
-
-        return null;
+        return sum;
     }
 }

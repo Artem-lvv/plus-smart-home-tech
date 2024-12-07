@@ -33,4 +33,5 @@ public interface OrderService {
 
     OrderDto productReturn(ProductReturnRequest productReturnRequest);
 
+    OrderDto paymentSuccess(UUID body);
 }

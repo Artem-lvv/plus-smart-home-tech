@@ -135,6 +135,42 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/NoOrderFoundException'
+  /api/v1/order/payment/paymentSuccess:
+    post:
+      tags:
+        - order
+      description: заказ оплачен.
+      operationId: paymentSuccess
+      parameters:
+        - name: orderId
+          in: query
+          description: Идентификатор заказа.
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+              description: Идентификатор заказа.
+              format: uuid
+        required: true
+      responses:
+        '200':
+          description: Заказ пользователя после  оплаты
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrderDto'
+        '400':
+          description: Не найден заказ
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/NoOrderFoundException'
   /api/v1/order/payment/failed:
     post:
       tags:

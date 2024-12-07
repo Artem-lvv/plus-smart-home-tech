@@ -35,4 +35,11 @@ CREATE TABLE IF NOT EXISTS reserved_products
     shopping_cart_id     UUID    NOT NULL,
     product_id           UUID    NOT NULL,
     reserved_quantity    INTEGER NOT NULL
-)
+);
+
+CREATE TABLE IF NOT EXISTS order_deliveries
+(
+    order_delivery_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    order_id          UUID    NOT NULL,
+    delivery_id       INTEGER NOT NULL
+);

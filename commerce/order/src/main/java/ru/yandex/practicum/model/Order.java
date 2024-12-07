@@ -39,6 +39,8 @@ public class Order {
     @Column(name = "shopping_cart_id", nullable = false)
     private UUID shoppingCartId;
 
+    private String username;
+
     @Column(name = "payment_id", nullable = true)
     private UUID paymentId;
 
