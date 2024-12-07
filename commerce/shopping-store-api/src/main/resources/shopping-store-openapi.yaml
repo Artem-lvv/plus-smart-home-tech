@@ -6,13 +6,13 @@ servers:
   - url: http://192.168.1.96:60458
     description: Generated server url
 tags:
-  - name: Витрина онлайн-магазина
+  - name: shopping-store
     description: API для обеспечения работы витрины онлайн магазина
 paths:
   /api/v1/shopping-store:
     get:
       tags:
-        - Витрина онлайн-магазина
+        - shopping-store
       description: Получение списка товаров по типу в пагинированном виде
       operationId: getProducts
       parameters:
@@ -43,7 +43,7 @@ paths:
                   $ref: '#/components/schemas/ProductDto'
     put:
       tags:
-        - Витрина онлайн-магазина
+        - shopping-store
       description: Создание нового товара в ассортименте
       operationId: createNewProduct
       requestBody:
@@ -61,7 +61,7 @@ paths:
                 $ref: '#/components/schemas/ProductDto'
     post:
       tags:
-        - Витрина онлайн-магазина
+        - shopping-store
       description: >-
         Обновление товара в ассортименте, например уточнение описания,
         характеристик и т.д.
@@ -88,7 +88,7 @@ paths:
   /api/v1/shopping-store/removeProductFromStore:
     post:
       tags:
-        - Витрина онлайн-магазина
+        - shopping-store
       description: >-
         Удалить товар из ассортимента магазина. Функция для менеджерского
         состава.
@@ -119,7 +119,7 @@ paths:
   /api/v1/shopping-store/quantityState:
     post:
       tags:
-        - Витрина онлайн-магазина
+        - shopping-store
       description: Установка статуса по товару. API вызывается со стороны склада.
       operationId: setProductQuantityState
       parameters:
@@ -147,7 +147,7 @@ paths:
   /api/v1/shopping-store/{productId}:
     get:
       tags:
-        - Витрина онлайн-магазина
+        - shopping-store
       description: Получить сведения по товару из БД.
       operationId: getProduct
       parameters:

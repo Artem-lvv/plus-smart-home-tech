@@ -1,8 +1,9 @@
 package ru.yandex.practicum.service;
 
-import ru.yandex.practicum.model.Pageable;
-import ru.yandex.practicum.model.ProductDto;
-import ru.yandex.practicum.model.SetProductQuantityStateRequest;
+
+import ru.yandex.practicum.shopping_store_api.model.Pageable;
+import ru.yandex.practicum.shopping_store_api.model.ProductDto;
+import ru.yandex.practicum.shopping_store_api.model.SetProductQuantityStateRequest;
 
 import java.util.List;
 import java.util.UUID;

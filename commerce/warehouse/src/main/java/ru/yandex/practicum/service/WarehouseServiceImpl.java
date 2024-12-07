@@ -8,12 +8,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.condig.AddressWarehouse;
 import ru.yandex.practicum.entity.Dimension;
+import ru.yandex.practicum.entity.OrderDelivery;
 import ru.yandex.practicum.entity.ProductInWarehouse;
 import ru.yandex.practicum.entity.ReservedProduct;
 import ru.yandex.practicum.entity.model.ProductIdToAvailableStock;
 import ru.yandex.practicum.exception.DuplicateEntityException;
 import ru.yandex.practicum.exception.EntityNotFoundException;
 import ru.yandex.practicum.exception.NotEnoughProductInStockException;
+import ru.yandex.practicum.repository.OrderDeliveryRepository;
 import ru.yandex.practicum.repository.ProductInWarehouseRepository;
 import ru.yandex.practicum.repository.ProductRepository;
 import ru.yandex.practicum.repository.ReservedProductRepository;
@@ -22,6 +24,7 @@ import ru.yandex.practicum.warehouse_api.model.AddressDto;
 import ru.yandex.practicum.warehouse_api.model.AssemblyProductForOrderFromShoppingCartRequest;
 import ru.yandex.practicum.warehouse_api.model.BookedProductsDto;
 import ru.yandex.practicum.warehouse_api.model.NewProductInWarehouseRequest;
+import ru.yandex.practicum.warehouse_api.model.ShippedToDeliveryRequest;
 import ru.yandex.practicum.warehouse_api.model.ShoppingCartDto;
 
 import java.util.ArrayList;
@@ -38,6 +41,8 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class WarehouseServiceImpl implements WarehouseService {
+
+    private final OrderDeliveryRepository orderDeliveryRepository;
 
     private final ReservedProductRepository reservedProductRepository;
     private final ProductInWarehouseRepository productInWarehouseRepository;
@@ -102,11 +107,22 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Override
     @Transactional
     public BookedProductsDto bookingProductForShoppingCart(ShoppingCartDto shoppingCartDto) {
-
         Map<UUID, Long> reservationProducts = shoppingCartDto.getProducts().entrySet()
                 .stream()
                 .collect(Collectors.toMap(entry -> UUID.fromString(entry.getKey()),
                         Map.Entry::getValue));
+
+        List<ReservedProduct> toReservation = getAndCheckAvailableProductsForReservation(shoppingCartDto,
+                reservationProducts);
+
+        reservedProductRepository.saveAll(toReservation);
+        log.info("Create ReservedProduct {}", toReservation);
+
+        return createBookingProductsDto(toReservation, reservationProducts);
+    }
+
+    private List<ReservedProduct> getAndCheckAvailableProductsForReservation(ShoppingCartDto shoppingCartDto,
+                                                                             Map<UUID, Long> reservationProducts) {
 
         Map<UUID, Long> availableStock = productInWarehouseRepository.findAvailableStock(reservationProducts.keySet()
                         .stream()
@@ -115,23 +131,7 @@ public class WarehouseServiceImpl implements WarehouseService {
                 .collect(Collectors.toMap(ProductIdToAvailableStock::getProductId,
                         ProductIdToAvailableStock::getAvailableStock));
 
-        List<ReservedProduct> toReservation = getReservedProducts(shoppingCartDto, reservationProducts, availableStock);
-
-        reservedProductRepository.saveAll(toReservation);
-        log.info("Create ReservedProduct {}", toReservation);
-
-        List<UUID> productIds = toReservation
-                .stream()
-                .map(ReservedProduct::getProductId)
-                .toList();
-
-        Map<UUID, ProductInWarehouse> productIdToPIW = productInWarehouseRepository
-                .findAllByProductId_Fetch(productIds)
-                .stream()
-                .collect(Collectors.toMap(productInWarehouse -> productInWarehouse.getProduct().getProductId(),
-                        productInWarehouse -> productInWarehouse));
-
-        return getBookedProductsDto(productIdToPIW, reservationProducts);
+        return getReservedProducts(shoppingCartDto, reservationProducts, availableStock);
     }
 
     @Override
@@ -179,7 +179,7 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     @Override
     @Transactional
-    public void acceptReturn(Map<String, Long> requestBody, List<Object> products) {
+    public void acceptReturn(Map<String, Long> requestBody) {
         List<UUID> productIds = requestBody.keySet()
                 .stream()
                 .map(UUID::fromString)
@@ -201,6 +201,47 @@ public class WarehouseServiceImpl implements WarehouseService {
 
         productInWarehouseRepository.saveAll(productInWarehouseMap.values());
         log.info("Update ProductInWarehouse {}", productInWarehouseMap);
+    }
+
+    @Override
+    public BookedProductsDto checkProductQuantityEnoughForShoppingCart(ShoppingCartDto shoppingCartDto) {
+        Map<UUID, Long> reservationProducts = shoppingCartDto.getProducts().entrySet()
+                .stream()
+                .collect(Collectors.toMap(entry -> UUID.fromString(entry.getKey()),
+                        Map.Entry::getValue));
+
+        List<ReservedProduct> toReservation = getAndCheckAvailableProductsForReservation(shoppingCartDto,
+                reservationProducts);
+
+        return createBookingProductsDto(toReservation, reservationProducts);
+    }
+
+    @Override
+    public Void shippedToDelivery(ShippedToDeliveryRequest shippedToDeliveryRequest) {
+        OrderDelivery orderDelivery = new OrderDelivery();
+        orderDelivery.setDeliveryId(shippedToDeliveryRequest.getDeliveryId());
+        orderDelivery.setOrderId(shippedToDeliveryRequest.getOrderId());
+
+        orderDeliveryRepository.save(orderDelivery);
+        log.info("Create OrderDelivery {}", orderDelivery);
+
+        return null;
+    }
+
+    private BookedProductsDto createBookingProductsDto(List<ReservedProduct> toReservation,
+                                                       Map<UUID, Long> reservationProducts) {
+        List<UUID> productIds = toReservation
+                .stream()
+                .map(ReservedProduct::getProductId)
+                .toList();
+
+        Map<UUID, ProductInWarehouse> productIdToPIW = productInWarehouseRepository
+                .findAllByProductId_Fetch(productIds)
+                .stream()
+                .collect(Collectors.toMap(productInWarehouse -> productInWarehouse.getProduct().getProductId(),
+                        productInWarehouse -> productInWarehouse));
+
+        return getBookedProductsDto(productIdToPIW, reservationProducts);
     }
 
     private BookedProductsDto getBookedProductsDto(Map<UUID, ProductInWarehouse> productIdToPIW,

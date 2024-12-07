@@ -1,12 +1,14 @@
 package ru.yandex.practicum.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,49 +19,47 @@ import lombok.ToString;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
 @Entity
+@Table(name = "orders")
 @Getter
 @Setter
 @Builder
 @ToString
 @RequiredArgsConstructor
 @AllArgsConstructor
-@Table(name = "products")
-public class ProductEntity {
+public class Order {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "product_id", nullable = false)
-    private UUID productId;
+    @GeneratedValue
+    private UUID orderId;
 
-    @Column(name = "product_name", nullable = false)
-    private String productName;
+    @Column(name = "shopping_cart_id", nullable = false)
+    private UUID shoppingCartId;
 
-    @Column(name = "description", nullable = false)
-    private String description;
+    private String username;
 
-    @Column(name = "image_src")
-    private String imageSrc;
+    @Column(name = "payment_id", nullable = true)
+    private UUID paymentId;
 
-    @Column(name = "quantity_state", nullable = false)
+    @Column(name = "delivery_id", nullable = true)
+    private UUID deliveryId;
+
     @Enumerated(EnumType.STRING)
-    private QuantityState quantityState;
+    private OrderState state;
 
-    @Column(name = "product_state", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private ProductState productState;
+    @OneToMany(mappedBy = "order", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<OrderProduct> products;
 
-    @Column(name = "rating", nullable = false)
-    private Double rating;
+    private Double deliveryWeight;
+    private Double deliveryVolume;
+    private Boolean fragile;
 
-    @Column(name = "product_category")
-    @Enumerated(EnumType.STRING)
-    private ProductCategory productCategory;
-
-    @Column(name = "price", nullable = false)
-    private BigDecimal price;
+    private BigDecimal totalPrice;
+    private BigDecimal deliveryPrice;
+    private BigDecimal productPrice;
 
     @Override
     public final boolean equals(Object o) {
@@ -68,8 +68,8 @@ public class ProductEntity {
         Class<?> oEffectiveClass = o instanceof HibernateProxy proxy ? proxy.getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy proxy ? proxy.getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        ProductEntity that = (ProductEntity) o;
-        return getProductId() != null && Objects.equals(getProductId(), that.getProductId());
+        Order order = (Order) o;
+        return getOrderId() != null && Objects.equals(getOrderId(), order.getOrderId());
     }
 
     @Override
